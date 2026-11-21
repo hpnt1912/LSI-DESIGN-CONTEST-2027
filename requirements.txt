@@ -1,0 +1,8 @@
+# PyTorch: cài riêng bản CPU trước
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+numpy
+matplotlib
+pillow
+opencv-python-headless
+jupyterlab
+cocotb

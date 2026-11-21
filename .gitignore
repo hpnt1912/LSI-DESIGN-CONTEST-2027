@@ -1,0 +1,52 @@
+# ---- Vivado ----
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.gen/
+*.srcs/
+*.xpr
+.Xil/
+vivado*.jou
+vivado*.log
+vivado*.str
+webtalk*
+usage_statistics_webtalk.*
+*.dcp
+*.bit
+*.ltx
+vivado/build/
+
+# ---- Simulation ----
+*.vcd
+*.fst
+*.ghw
+sim
+*.vvp
+obj_dir/
+sim_build/
+results.xml
+__pycache__/
+
+# ---- Python / ML ----
+.venv/
+venv/
+*.pyc
+.ipynb_checkpoints/
+data/
+datasets/
+*.pt
+*.pth
+*.onnx
+runs/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+*.swp
+
+# ---- Tài liệu PDF của ban tổ chức (không phân phối lại) ----
+docs/*.pdf
