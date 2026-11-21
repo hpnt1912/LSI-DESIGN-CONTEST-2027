@@ -41,8 +41,8 @@ Chạy mô phỏng / lệnh trong Ubuntu, không chạy qua đường `\\wsl` t�
 - [x] Repo GitHub: https://github.com/hpnt1912/lsi-design-contest-2027
 
 ### Đang làm / còn lại
-- [ ] Vivado 2025.2 vào `D:\fpga` (đang cài)
-- [ ] Kiểm tra Vivado: project với `counter.v`, part `xc7s25csga225-1`, Run Synthesis → Utilization phải có 4 FF
+- [x] Vivado 2025.2 vào `D:\fpga` (đang cài)
+- [x] Kiểm tra Vivado: project với `counter.v`, part `xc7s25csga225-1`, Run Synthesis → Utilization phải có 4 FF
 - [x] PyTorch CPU + `pip install -r requirements.txt` + `python model/prepare_cifar4.py`
 - [ ] Gửi mail mượn ZERO7 (khaild@uit.edu.vn, tiêu đề `Zero7 board <Trường> <Họ tên>`)
 - [ ] Tải tài liệu PDF ZERO7 về máy (link trong `docs/README.md`)
