@@ -21,16 +21,74 @@ Máy có thêm Ubuntu dual boot từ trước; không dùng cho dự án này, k
 Dung lượng (21/11/2026, trước khi cài Vivado): ổ C trống ~48 GB, ổ D trống ~165 GB.
 Quy tắc: phần mềm nặng cài vào ổ D, giữ ổ C trống ≥ 20 GB.
 
-## 2. Mở thư mục repo
+## 2. Mở thư mục, tài liệu và dùng Claude Code
 
+### 2.1. Hai "thế giới" file trên máy
+| Nơi | Ví dụ | Mở từ Windows |
+|---|---|---|
+| **Trong Ubuntu (WSL2)** | repo, `data/`, `docs/*.pdf` | File Explorer → **Linux** → Ubuntu → home → `<user>` → ... |
+| **Ổ Windows** | Vivado `D:\fpga`, project Vivado `D:\LSI2027` | Mở bình thường |
+
+- `<user>` = username Ubuntu (chữ đứng trước `@` trên dấu nhắc lệnh).
+- Trong Ubuntu, ổ Windows nằm ở `/mnt/c`, `/mnt/d` (ví dụ `D:\LSI2027` = `/mnt/d/LSI2027`).
+- Chạy mô phỏng / lệnh trong Ubuntu, trên thư mục `~/...`; không chạy qua `\\wsl` hay `/mnt/d` (chậm).
+
+### 2.2. Mở thư mục repo
 | Cách | Lệnh / thao tác |
 |---|---|
 | File Explorer từ Ubuntu | `cd ~/projects/lsi-design-contest-2027 && explorer.exe .` |
-| File Explorer trực tiếp | Thanh bên trái → **Linux** → Ubuntu → home → `<user>` → projects |
+| File Explorer trực tiếp | Dán vào thanh địa chỉ: `\\wsl.localhost\Ubuntu\home\<user>\projects\lsi-design-contest-2027` |
 | VS Code (khuyên dùng) | `cd ~/projects/lsi-design-contest-2027 && code .` |
 | Claude Code | `cd ~/projects/lsi-design-contest-2027 && claude` |
 
-Chạy mô phỏng / lệnh trong Ubuntu, không chạy qua đường `\\wsl` từ Windows (chậm).
+Mẹo: chuột phải thư mục repo trong File Explorer → **Pin to Quick access**.
+
+### 2.3. Tài liệu PDF của ban tổ chức
+PDF **chỉ lưu trên máy**, không đẩy lên GitHub (`.gitignore` chặn `docs/*.pdf`). Link gốc: xem `docs/README.md`.
+
+| Bản | Vị trí | Dùng để |
+|---|---|---|
+| Trong repo (Ubuntu) | `~/projects/lsi-design-contest-2027/docs/` | Claude Code đọc khi cần |
+| Bản copy trên Windows | `D:\LSI2027\docs\` | Đọc bằng trình xem PDF / WPS / Zotero |
+
+```bash
+# Tải lại (chạy ở thư mục gốc repo; trong Claude Code thêm dấu ! ở đầu)
+wget -P docs https://www.lsi-contest.com/Initialize_20260618_EN.pdf \
+             https://www.lsi-contest.com/ZERO7FPGA_Connection-table_261109_001.pdf
+# Copy sang ổ D
+mkdir -p /mnt/d/LSI2027/docs && cp docs/*.pdf /mnt/d/LSI2027/docs/
+# Mở thư mục docs bằng File Explorer
+explorer.exe docs
+```
+
+| File | Nội dung |
+|---|---|
+| `Initialize_20260618_EN.pdf` | Cài Pi + ZERO7, thiết kế và chạy bài mẫu (nạp JTAG bằng Vivado Hardware Manager) |
+| `ZERO7FPGA_Connection-table_261109_001.pdf` | Bảng nối chân GPIO Pi ↔ chân FPGA, dùng để viết `.xdc` |
+
+### 2.4. Dùng Claude Code
+| Thao tác | Tác dụng |
+|---|---|
+| `!<lệnh>` | Chạy lệnh shell ngay trong Claude Code, ví dụ `!git pull`, `!ls docs` |
+| `Shift+Tab` | Đổi chế độ: hỏi trước từng bước / tự sửa file / **auto mode** (tự chạy lệnh không hỏi) / Plan mode |
+| `Esc` | Dừng Claude giữa chừng |
+| `/clear` | Xoá ngữ cảnh khi chuyển sang việc khác |
+| `/usage` | Xem hạn mức gói Pro đã dùng |
+| `@<file>` | Chỉ đích danh file cho Claude đọc |
+| `/exit` | Thoát Claude Code |
+
+- Dòng chữ mờ trong ô nhập chỉ là **gợi ý tự động**; không bấm Tab/Enter nếu không muốn làm việc đó.
+- Cập nhật checklist: nói với Claude Code "đánh dấu [x] mục ... trong docs/SETUP.md rồi commit, push".
+- Lỗi `claude is not recognized` trên Windows: đóng hẳn PowerShell, mở cửa sổ mới (không Admin).
+  Nếu vẫn lỗi, kiểm tra `Test-Path "$env:USERPROFILE\.local\bin\claude.exe"`.
+
+### 2.5. Vivado
+- Mở: shortcut **Vivado 2025.2** trên Desktop.
+- Tạo project mới: đặt trong `D:\LSI2027\...` (không dấu, không cách), Part: `xc7s25csga225-1`.
+- Xem tài nguyên: sau **Run Synthesis** → **Open Synthesized Design** → **Reports → Report Utilization**.
+- Báo cáo tổng hợp dạng file `.rpt` nằm trong `<project>.runs/synth_1/` (ví dụ `counter_utilization_synth.rpt`).
+- Tạo báo cáo bằng script của repo: `vivado -mode batch -source vivado/scripts/synth_xc7s25.tcl -tclargs <top>`
+  (chạy trong **Vivado 2025.2 Tcl Shell** trên Windows, tại thư mục repo).
 
 ## 3. Checklist cài đặt
 
@@ -49,7 +107,8 @@ Chạy mô phỏng / lệnh trong Ubuntu, không chạy qua đường `\\wsl` t�
 ### Còn lại
 - [ ] Xoá file tải tạm `D:\fpga\Downloads` (~16 GB)
 - [ ] Gửi mail mượn ZERO7 (khaild@uit.edu.vn, tiêu đề `Zero7 board <Trường> <Họ tên>`)
-- [ ] Tải tài liệu PDF ZERO7 về máy (link trong `docs/README.md`)
+- [x] Tải tài liệu PDF ZERO7 vào `docs/` của repo (xem mục 2.3)
+- [ ] Copy PDF sang `D:\LSI2027\docs` (không bắt buộc)
 
 ### Khi có phần cứng
 - [ ] Raspberry Pi Imager → Raspberry Pi OS 64-bit, bật SSH + Wi-Fi
