@@ -7,6 +7,7 @@ Cập nhật: 21/11/2026
 | Thành phần | Vị trí | Ghi chú |
 |---|---|---|
 | **Vivado ML Standard 2025.2** | `D:\fpga\2025.2\Vivado` | Chạy trên Windows. Chỉ cài Spartan-7 + Cable Drivers |
+| Project Vivado | `D:\LSI2027\` | Đường dẫn không dấu, không cách. Project thử: `D:\LSI2027\vivado_test` |
 | Vitis HLS (cài kèm, không bỏ được) | `D:\fpga\2025.2\Vitis` | Dùng nếu viết CNN bằng C/C++ → RTL |
 | File tải tạm của bộ cài Vivado | `D:\fpga\Downloads\Vivado_2025.2` | Khoảng 16 GB, xoá được sau khi cài xong |
 | Claude Code (Windows) | `%USERPROFILE%\.local\bin\claude.exe` | Lệnh `claude` trong PowerShell |
@@ -39,11 +40,14 @@ Chạy mô phỏng / lệnh trong Ubuntu, không chạy qua đường `\\wsl` t�
 - [x] Icarus Verilog, GTKWave, Verilator, Yosys, cocotb (venv `~/eda-venv`)
 - [x] Kiểm tra bằng bộ đếm 4 bit (`~/projects/test-eda`)
 - [x] Repo GitHub: https://github.com/hpnt1912/lsi-design-contest-2027
+- [x] Vivado 2025.2 vào `D:\fpga`
+- [x] Kiểm tra Vivado: project thử ở `D:\LSI2027\vivado_test\test_counter`, part `xc7s25csga225-1`,
+      Run Synthesis → 4 register
+- [x] PyTorch CPU + `requirements.txt` + `python model/prepare_cifar4.py`
+      → `data/cifar4.npz`: 5000 train / 1000 test mỗi lớp (tổng 20000 / 4000)
 
-### Đang làm / còn lại
-- [x] Vivado 2025.2 vào `D:\fpga` (đang cài)
-- [x] Kiểm tra Vivado: project với `counter.v`, part `xc7s25csga225-1`, Run Synthesis → Utilization phải có 4 FF
-- [x] PyTorch CPU + `pip install -r requirements.txt` + `python model/prepare_cifar4.py`
+### Còn lại
+- [ ] Xoá file tải tạm `D:\fpga\Downloads` (~16 GB)
 - [ ] Gửi mail mượn ZERO7 (khaild@uit.edu.vn, tiêu đề `Zero7 board <Trường> <Họ tên>`)
 - [ ] Tải tài liệu PDF ZERO7 về máy (link trong `docs/README.md`)
 
