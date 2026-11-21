@@ -8,6 +8,9 @@ Dự án thi LSI Design Contest in Hokkaido 2027: phần cứng CNN phân loại
 - Đầu vào ảnh 32×32 RGB; 4 lớp theo thứ tự chỉ số: 0 cat, 1 dog, 2 deer, 3 horse.
 - Board ZERO7 là HAT gắn GPIO 40 chân của Raspberry Pi 5; Pi lo camera và hiển thị.
 
+## Môi trường
+- Vị trí phần mềm, đường dẫn và checklist cài đặt: `docs/SETUP.md` (cập nhật file này khi môi trường thay đổi).
+
 ## Quy ước code
 - RTL: Verilog-2001, một module mỗi file, tên file = tên module.
 - Reset đồng bộ, tích cực mức thấp `rst_n`; clock tên `clk`.

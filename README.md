@@ -48,6 +48,7 @@ vivado -mode batch -source vivado/scripts/synth_xc7s25.tcl -tclargs <ten_module_
 
 Kết quả nằm trong `reports/` (utilization, timing summary).
 
-## Tài liệu cuộc thi
+## Tài liệu
 
-Xem [`docs/README.md`](docs/README.md).
+- Tài liệu cuộc thi: [`docs/README.md`](docs/README.md)
+- Môi trường, đường dẫn trên máy, checklist cài đặt: [`docs/SETUP.md`](docs/SETUP.md)
