@@ -27,8 +27,8 @@ Mỗi level có outline thiết kế phần cứng và file Verilog để mô ph
 ## Mã ví dụ
 
 - Trang 3-6 có PDF "CNN example" và zip mã Octave 3.8.
-- Repo đang lưu một bản tại `file/CNN2019.zip` (8 file `.m`: `Convolutional_layer`, `Pooling_layer`, `Output_layer`,
-  các hàm `*_Backprop`, `Kensho`, `OX_Judgment`). Tên thư mục bên trong mã hoá tiếng Nhật, giải nén có thể lỗi font.
+- Repo lưu bản gốc và bản giải nén (UTF-8) trong [`reference/`](reference/README.md): bài nhận dạng 〇/× ảnh 3×3,
+  Conv 2×2 → MaxPool → FC, sigmoid, bình phương sai số.
 
 ## Áp dụng cho bài 2027
 
