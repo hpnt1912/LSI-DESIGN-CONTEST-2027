@@ -13,6 +13,12 @@
 - Bảng chân kết nối FPGA (ZERO7 FPGA Connection Table):
   https://www.lsi-contest.com/ZERO7FPGA_Connection-table_261109_001.pdf
 
+## Datasheet chip
+
+- AMD DS180 – 7 Series FPGAs Data Sheet: Overview (bảng tài nguyên Spartan-7):
+  tìm "DS180 7 Series Overview" trên docs.amd.com
+
+Tóm tắt các tài liệu trên: [`hardware.md`](hardware.md), [`cnn23_reference.md`](cnn23_reference.md).
 PDF của ban tổ chức không đưa lên repo; tải về máy để đọc.
 
 ## Tóm tắt yêu cầu

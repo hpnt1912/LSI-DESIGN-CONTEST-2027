@@ -50,5 +50,9 @@ Kết quả nằm trong `reports/` (utilization, timing summary).
 
 ## Tài liệu
 
+- Kế hoạch mô hình Python (2 tuần): [`docs/PLAN.md`](docs/PLAN.md)
+- Đặc tả mô hình: [`docs/model_spec.md`](docs/model_spec.md)
+- Chip XC7S25 và board ZERO7: [`docs/hardware.md`](docs/hardware.md)
+- Tham khảo CNN lần 23: [`docs/cnn23_reference.md`](docs/cnn23_reference.md)
 - Tài liệu cuộc thi: [`docs/README.md`](docs/README.md)
 - Môi trường, đường dẫn trên máy, checklist cài đặt: [`docs/SETUP.md`](docs/SETUP.md)

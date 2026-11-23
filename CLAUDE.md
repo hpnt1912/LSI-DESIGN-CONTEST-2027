@@ -8,15 +8,25 @@ Dự án thi LSI Design Contest in Hokkaido 2027: phần cứng CNN phân loại
 - Đầu vào ảnh 32×32 RGB; 4 lớp theo thứ tự chỉ số: 0 cat, 1 dog, 2 deer, 3 horse.
 - Board ZERO7 là HAT gắn GPIO 40 chân của Raspberry Pi 5; Pi lo camera và hiển thị.
 
+## Tài liệu dự án (đọc khi cần)
+- `docs/PLAN.md`: kế hoạch từng ngày, đánh dấu `[x]` khi xong.
+- `docs/model_spec.md`: yêu cầu mô hình CNN.
+- `docs/hardware.md`: tài nguyên XC7S25 (14.600 LUT, 80 DSP, 1.620 Kb BRAM), bảng chân ZERO7 (clock 20 MHz ở B13).
+- `docs/cnn23_reference.md`: lý thuyết CNN của cuộc thi lần 23 (đề yêu cầu tham khảo).
+- `docs/SETUP.md`: vị trí phần mềm, đường dẫn, checklist cài đặt (cập nhật khi môi trường thay đổi).
+
 ## Môi trường
-- Vị trí phần mềm, đường dẫn và checklist cài đặt: `docs/SETUP.md` (cập nhật file này khi môi trường thay đổi).
+- Ubuntu WSL2, user `ngoc_thang`, repo ở `~/projects/lsi-design-contest-2027`, venv `~/eda-venv` (PyTorch bản CPU).
 
 ## Quy ước code
 - RTL: Verilog-2001, một module mỗi file, tên file = tên module.
 - Reset đồng bộ, tích cực mức thấp `rst_n`; clock tên `clk`.
 - Số học fixed-point; ghi rõ định dạng (ví dụ Q1.7) trong comment đầu module.
 - Mỗi module RTL có testbench trong `tb/`, so sánh với mô hình Python tham chiếu trong `model/`.
-- Python: PEP 8, dùng `pathlib`.
+- Python: PEP 8, dùng `pathlib`. Chạy script từ thư mục gốc repo.
+- Mô hình: chỉ dùng Conv 3×3, ReLU, MaxPool 2×2, Linear; output 4 logit, phần cứng lấy argmax.
+- Cố định seed (`torch.manual_seed`) để kết quả lặp lại được; ghi kết quả thử nghiệm vào `model/results.md`.
+- Lượng tử hóa: int8 trọng số/activation, int32 bias, scale lũy thừa của 2. `model/golden_int.py` là chuẩn bit-exact cho RTL.
 
 ## Lệnh hay dùng
 - Lint: `verilator --lint-only -Wall rtl/<file>.v`
@@ -28,5 +38,7 @@ Dự án thi LSI Design Contest in Hokkaido 2027: phần cứng CNN phân loại
 ## Cách làm việc
 - Trả lời bằng tiếng Việt.
 - Trước khi sửa nhiều file, nêu kế hoạch ngắn.
+- Người dùng đang học: giải thích ngắn gọn code mới viết (mỗi khối làm gì), không chỉ đưa code.
+- Mỗi phiên làm đúng một việc trong `docs/PLAN.md`; xong thì cập nhật checklist.
 - Chạy lint + mô phỏng sau khi sửa RTL; chỉ commit khi pass.
 - Không commit dataset, file `.vcd`, thư mục build của Vivado.

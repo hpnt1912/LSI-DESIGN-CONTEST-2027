@@ -5,4 +5,7 @@ matplotlib
 pillow
 opencv-python-headless
 jupyterlab
+scikit-learn   # confusion matrix
+tqdm           # thanh tiến trình khi huấn luyện
+# brevitas     # (tuỳ chọn) huấn luyện có lượng tử hóa
 cocotb
