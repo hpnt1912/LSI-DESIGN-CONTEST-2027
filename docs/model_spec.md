@@ -17,7 +17,12 @@
 - Clock gốc trên board: 20 MHz (nâng được bằng MMCM)
 - Ngân sách: trọng số int8 ≤ ~100 KB; số MAC/ảnh là tiêu chí chính khi chọn kiến trúc (quyết định tốc độ)
 - Chỉ dùng các phép: Conv 3×3, ReLU, MaxPool 2×2, Fully connected (theo tài liệu lần 23)
-- Lượng tử hóa: trọng số và activation int8, bias int32, scale lũy thừa của 2
+- Lượng tử hóa: trọng số int8, activation uint8 (sau ReLU), bias/tổng tích luỹ int32, thang lũy thừa của 2 theo từng tầng
+
+## Kết quả (23/11/2026, xem `model/results.md`)
+- Mô hình chọn: B_16_32_64 – 27.684 tham số, 2,8 triệu MAC/ảnh, 27 KB int8
+- Accuracy test: 79,67% (float), 79,83% (số nguyên int8); golden model trùng từng bit với cách tính thứ hai
+- Hướng dẫn chi tiết: `docs/HuongDan_MoHinh_CNN_Python.docx`
 
 ## Tiêu chí đánh giá
 - Độ chính xác trên tập test và ảnh thật

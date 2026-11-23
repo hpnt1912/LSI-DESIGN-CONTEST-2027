@@ -3,8 +3,11 @@
 Mô hình CNN (PyTorch) và mô hình tham chiếu số nguyên cho RTL. Kế hoạch: [`../docs/PLAN.md`](../docs/PLAN.md),
 yêu cầu: [`../docs/model_spec.md`](../docs/model_spec.md).
 
+Tất cả file dưới đây đã viết xong và chạy thử. Hướng dẫn đọc hiểu: `docs/HuongDan_MoHinh_CNN_Python.docx`.
+
 | File | Ngày | Việc |
 |---|---|---|
+| `config.py` | 1 | Cấu hình chung (đường dẫn, seed, siêu tham số, kiến trúc chọn) |
 | `prepare_cifar4.py` | ✅ | Tải CIFAR-10, giữ 4 lớp → `data/cifar4.npz` |
 | `data.py` | 2 | DataLoader, chuẩn hoá, augmentation, tách validation |
 | `net.py` | 3 | Định nghĩa các kiến trúc CNN |
@@ -14,7 +17,8 @@ yêu cầu: [`../docs/model_spec.md`](../docs/model_spec.md).
 | `quantize.py` | 8–10 | BN folding, lượng tử hóa int8 (PTQ/QAT) |
 | `golden_int.py` | 11 | Suy luận chỉ bằng số nguyên (NumPy), khớp từng bit với RTL |
 | `export.py` | 12 | Xuất trọng số `.mem` + vector kiểm thử vào `model/export/` |
-| `real_images/` | 13 | Ảnh thật 32×32 theo thư mục lớp |
+| `predict_image.py` | 13 | Dự đoán ảnh thật trong `real_images/<lớp>/` |
+| `report.py` | – | Ghi một mục vào `results.md` |
 
 Chạy mọi script từ thư mục gốc repo, ví dụ `python model/train.py`.
 Dataset, checkpoint (`*.pt`) không commit; `model/export/` thì commit (file nhỏ, RTL cần dùng).

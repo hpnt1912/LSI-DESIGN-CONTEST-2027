@@ -3,6 +3,7 @@
 *.hw/
 *.ip_user_files/
 *.runs/
+model/checkpoints/
 *.sim/
 *.gen/
 *.srcs/
@@ -40,6 +41,7 @@ datasets/
 *.pth
 *.onnx
 runs/
+model/checkpoints/
 
 # ---- OS / editor ----
 .DS_Store

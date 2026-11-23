@@ -1,6 +1,6 @@
 # Kế hoạch: mô hình Python (2 tuần, 23/11 – 07/12/2026)
 
-Mỗi ngày làm một việc, xong thì đánh dấu `[x]` và commit. Chi tiết yêu cầu mô hình xem [`model_spec.md`](model_spec.md).
+**Code của cả 14 ngày đã hoàn chỉnh và chạy thử** (kết quả trong `model/results.md`). Checklist dưới đây dùng để theo dõi tiến độ *học*: mỗi ngày chạy lại, đọc hiểu code theo file hướng dẫn `docs/HuongDan_MoHinh_CNN_Python.docx`, trả lời câu hỏi tự kiểm tra rồi đánh dấu `[x]`. Chi tiết yêu cầu mô hình xem [`model_spec.md`](model_spec.md).
 
 ## Tuần 1: mô hình số thực (float)
 
