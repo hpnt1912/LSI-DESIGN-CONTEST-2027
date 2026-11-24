@@ -1,0 +1,126 @@
+{
+  "arch": "E2_lite+cinic",
+  "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
+  "layers": [
+    {
+      "name": "conv1",
+      "type": "conv",
+      "f_in": 8,
+      "fw": 11,
+      "f_acc": 19,
+      "wbits": 16,
+      "f_out": 5,
+      "shift": 14,
+      "a_max": 7.0200251733912955,
+      "pool": true,
+      "w_shape": [
+        32,
+        3,
+        3,
+        3
+      ],
+      "w_range": [
+        -27268,
+        20066
+      ],
+      "b_range": [
+        -1066616,
+        617831
+      ]
+    },
+    {
+      "name": "conv2",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 7,
+      "f_acc": 12,
+      "f_out": 6,
+      "shift": 6,
+      "a_max": 3.5877097056436034,
+      "pool": true,
+      "w_shape": [
+        64,
+        32,
+        3,
+        3
+      ],
+      "w_range": [
+        -46,
+        67
+      ],
+      "b_range": [
+        -5543,
+        3655
+      ]
+    },
+    {
+      "name": "conv3",
+      "type": "conv",
+      "f_in": 6,
+      "fw": 7,
+      "f_acc": 13,
+      "f_out": 5,
+      "shift": 8,
+      "a_max": 4.4881410185812225,
+      "pool": false,
+      "w_shape": [
+        64,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -54,
+        70
+      ],
+      "b_range": [
+        -16420,
+        17598
+      ]
+    },
+    {
+      "name": "conv4",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 8,
+      "f_acc": 13,
+      "f_out": 6,
+      "shift": 7,
+      "a_max": 2.362143958770611,
+      "pool": true,
+      "w_shape": [
+        128,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -50,
+        75
+      ],
+      "b_range": [
+        -11447,
+        7069
+      ]
+    },
+    {
+      "name": "fc",
+      "type": "linear",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "w_shape": [
+        4,
+        2048
+      ],
+      "w_range": [
+        -53,
+        75
+      ],
+      "b_range": [
+        -11850,
+        7493
+      ]
+    }
+  ]
+}

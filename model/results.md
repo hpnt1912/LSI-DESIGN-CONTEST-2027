@@ -14,6 +14,8 @@
 | B3_kd_16_32_64 | 27,684 | 2,805,760 | 27.0 | 100 | 86.45% | 83.58% | 24.5 phút |
 | B3b_dbl8_64 | 64,612 | 5,165,056 | 63.1 | 100 | 87.15% | 85.08% | 14.1 phút |
 | B3c_c4x4_128 | 105,636 | 3,989,504 | 103.2 | 100 | 86.50% | 85.30% | 13.0 phút |
+| E2_lite+cinic | 138,372 | 12,689,408 | 135.1 | 30 | 87.70% | 89.22% | 43.9 phút |
+| E2_lite+cinic_ft | 138,372 | 12,689,408 | 135.1 | 15 | 89.45% | 89.83% | 10.6 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -277,3 +279,45 @@ Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
 Nhầm nhiều nhất: **cat → dog** (183 ảnh).
 
 Hình: `figures/confusion_B3b_dbl8_64.png`, `figures/errors_B3b_dbl8_64.png`.
+
+## Lượng tử hoá (int8) – E2_lite+cinic
+
+Kiến trúc **E2_lite+cinic**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 4.0e-06 |
+| Accuracy float (sau gộp BN) | 89.22% |
+| Accuracy số nguyên (golden model) | 89.25% |
+| Chênh lệch (số nguyên − float) | +0.02 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.4% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 11 | 5 | 14 | [32, 3, 3, 3] | [-27268, 20066] |
+| conv2 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-46, 67] |
+| conv3 | 6 | 7 | 5 | 8 | [64, 64, 3, 3] | [-54, 70] |
+| conv4 | 5 | 8 | 6 | 7 | [128, 64, 3, 3] | [-50, 75] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-53, 75] |
+
+## Lượng tử hoá (int8) – E2_lite+cinic_ft
+
+Kiến trúc **E2_lite+cinic_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 4.1e-06 |
+| Accuracy float (sau gộp BN) | 89.83% |
+| Accuracy số nguyên (golden model) | 89.95% |
+| Chênh lệch (số nguyên − float) | +0.12 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 99.0% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 11 | 5 | 14 | [32, 3, 3, 3] | [-26377, 19742] |
+| conv2 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-46, 66] |
+| conv3 | 6 | 7 | 5 | 8 | [64, 64, 3, 3] | [-54, 71] |
+| conv4 | 5 | 8 | 6 | 7 | [128, 64, 3, 3] | [-59, 79] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-53, 74] |
