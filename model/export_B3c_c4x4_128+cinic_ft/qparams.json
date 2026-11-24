@@ -1,0 +1,126 @@
+{
+  "arch": "B3c_c4x4_128+cinic_ft",
+  "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
+  "layers": [
+    {
+      "name": "conv1",
+      "type": "conv",
+      "f_in": 8,
+      "fw": 11,
+      "f_acc": 19,
+      "wbits": 16,
+      "f_out": 4,
+      "shift": 15,
+      "a_max": 9.112090497813973,
+      "pool": true,
+      "w_shape": [
+        16,
+        3,
+        3,
+        3
+      ],
+      "w_range": [
+        -16961,
+        10830
+      ],
+      "b_range": [
+        -451026,
+        654383
+      ]
+    },
+    {
+      "name": "conv2",
+      "type": "conv",
+      "f_in": 4,
+      "fw": 6,
+      "f_acc": 10,
+      "f_out": 5,
+      "shift": 5,
+      "a_max": 5.356903587944361,
+      "pool": true,
+      "w_shape": [
+        32,
+        16,
+        3,
+        3
+      ],
+      "w_range": [
+        -65,
+        76
+      ],
+      "b_range": [
+        -2512,
+        1329
+      ]
+    },
+    {
+      "name": "conv3",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 7,
+      "f_acc": 12,
+      "f_out": 6,
+      "shift": 6,
+      "a_max": 3.4595509550805335,
+      "pool": true,
+      "w_shape": [
+        64,
+        32,
+        3,
+        3
+      ],
+      "w_range": [
+        -62,
+        99
+      ],
+      "b_range": [
+        -8499,
+        6599
+      ]
+    },
+    {
+      "name": "conv4",
+      "type": "conv",
+      "f_in": 6,
+      "fw": 7,
+      "f_acc": 13,
+      "f_out": 6,
+      "shift": 7,
+      "a_max": 3.3714699925645513,
+      "pool": false,
+      "w_shape": [
+        128,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -43,
+        67
+      ],
+      "b_range": [
+        -7462,
+        7459
+      ]
+    },
+    {
+      "name": "fc",
+      "type": "linear",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "w_shape": [
+        4,
+        2048
+      ],
+      "w_range": [
+        -91,
+        72
+      ],
+      "b_range": [
+        -5511,
+        3610
+      ]
+    }
+  ]
+}
