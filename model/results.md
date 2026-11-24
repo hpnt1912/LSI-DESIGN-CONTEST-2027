@@ -118,3 +118,27 @@ Kiến trúc **B2_16_32_64_opt**. Trọng số int8, activation uint8, bias/tổ
 | conv2 | 5 | 8 | 6 | 7 | [32, 16, 3, 3] | [-106, 88] |
 | conv3 | 6 | 7 | 6 | 7 | [64, 32, 3, 3] | [-59, 69] |
 | fc | 6 | 8 | – | – | [4, 1024] | [-69, 78] |
+
+## Đánh giá chi tiết (float) – B2_16_32_64_opt
+
+Kiến trúc **B2_16_32_64_opt**, accuracy test **83.88%**.
+
+| Lớp | Accuracy |
+|---|---|
+| cat | 75.3% |
+| dog | 80.8% |
+| deer | 89.5% |
+| horse | 89.9% |
+
+Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
+
+| | cat | dog | deer | horse |
+|---|---|---|---|---|
+| **cat** | 753 | 148 | 64 | 35 |
+| **dog** | 116 | 808 | 48 | 28 |
+| **deer** | 55 | 24 | 895 | 26 |
+| **horse** | 28 | 36 | 37 | 899 |
+
+Nhầm nhiều nhất: **cat → dog** (148 ảnh).
+
+Hình: `figures/confusion_B2_16_32_64_opt.png`, `figures/errors_B2_16_32_64_opt.png`.
