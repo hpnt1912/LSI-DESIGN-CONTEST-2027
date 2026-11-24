@@ -59,11 +59,12 @@ def main():
     out_shape = {name: list(t.shape[1:]) for name, t in trace}
     lines = []
     for L in layers:
-        write_mem(wdir / f"{L['name']}_w.mem", L["w"], 8)
+        wbits = L.get("wbits", 8)                     # int8 mặc định; conv1 có thể là int16
+        write_mem(wdir / f"{L['name']}_w.mem", L["w"], wbits)
         write_mem(wdir / f"{L['name']}_b.mem", L["b"], 32)
         shift = L.get("shift", "–")
         pool = ("có" if L.get("pool", True) else "không") if L["type"] == "conv" else "–"
-        lines.append(f"| {L['name']} | {L['type']} | {list(L['w'].shape)} | {L['w'].size} | {len(L['b'])} | "
+        lines.append(f"| {L['name']} | {L['type']} | {list(L['w'].shape)} | int{wbits} | {L['w'].size} | {len(L['b'])} | "
                      f"{L['f_in']} | {L['fw']} | {L.get('f_out', '–')} | {shift} | {pool} | "
                      f"{out_shape[L['name']]} |")
     last_conv = [t for name, t in trace if name.startswith("conv")][-1]
@@ -86,8 +87,8 @@ def main():
 Sinh tự động bởi `model/quantize.py` và `model/export.py` – không sửa tay.
 Kiến trúc: **{meta['arch']}**. Ảnh vào: {meta['input']}.
 
-| Tầng | Loại | Kích thước W | Số W | Số bias | f_in | fw | f_out | shift | MaxPool | Đầu ra [C,H,W] |
-|---|---|---|---|---|---|---|---|---|---|---|
+| Tầng | Loại | Kích thước W | Bit W | Số W | Số bias | f_in | fw | f_out | shift | MaxPool | Đầu ra [C,H,W] |
+|---|---|---|---|---|---|---|---|---|---|---|---|
 {chr(10).join(lines)}
 
 ## Phép tính mỗi tầng conv (padding 1, stride 1)
@@ -103,7 +104,8 @@ Tầng fc: `logit[o] = sum(W[o][k] * X[k]) + B[o]` (int32), lớp = argmax(logit
 - `W` conv: `[o][c][ky][kx]`; `W` fc: `[o][k]` với `k = c*{h_last * w_last} + h*{w_last} + w`
   (đầu vào fc là {c_last}×{h_last}×{w_last}).
 - Ảnh / feature map: `[c][h][w]`. Ảnh vào là pixel 0..255, kênh R, G, B.
-- int8/uint8: 2 chữ số hex; int32: 8 chữ số hex; số âm ở dạng bù 2.
+- int8/uint8: 2 chữ số hex; int16: 4 chữ số hex; int32: 8 chữ số hex; số âm ở dạng bù 2.
+  Cột "Bit W" cho biết độ rộng trọng số từng tầng (int16 x uint8 vẫn vừa một DSP48E1 25x18).
 
 ## Vector kiểm thử (`testvec/`)
 {n} ảnh đầu của tập test CIFAR-4. Với ảnh `i`: `img<i>_input.mem` (3×32×32), {conv_names}

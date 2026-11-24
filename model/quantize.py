@@ -86,18 +86,25 @@ def frac_bits_for(max_abs, q_max):
     return int(np.floor(np.log2(q_max / max_abs)))
 
 
-def quantize(layers, calib_x):
-    """calib_x: tensor ảnh float (N,3,32,32). Trả về list tầng số nguyên + thông tin."""
+def quantize(layers, calib_x, conv1_bits=8):
+    """calib_x: tensor ảnh float (N,3,32,32). Trả về list tầng số nguyên + thông tin.
+    conv1_bits=16: riêng tầng đầu dùng trọng số int16 (chỉ vài trăm trọng số; DSP48E1 nhân 25x18 bit
+    nên int16 x uint8 vẫn vừa 1 DSP). Dùng khi gộp BN làm trọng số conv1 quá lớn -> fw nhỏ, sai số lớn."""
     _, acts = float_forward(layers, calib_x.double())
     q_layers, f_in = [], 8                                   # ảnh vào: pixel/256 -> 8 bit phần lẻ
     for i, L in enumerate(layers):
-        fw = frac_bits_for(np.abs(L["w"]).max(), 127)
-        wq = np.clip(np.round(L["w"] * 2.0 ** fw), -128, 127).astype(np.int8)
+        wbits = conv1_bits if i == 0 else 8
+        w_max = 2 ** (wbits - 1) - 1                         # 127 (int8) hoặc 32767 (int16)
+        fw = frac_bits_for(np.abs(L["w"]).max(), w_max)
+        wq = np.clip(np.round(L["w"] * 2.0 ** fw), -w_max - 1, w_max)
+        wq = wq.astype(np.int8 if wbits == 8 else np.int16)
         f_acc = f_in + fw
         bq = np.round(L["b"] * 2.0 ** f_acc).astype(np.int64)
         assert np.abs(bq).max() < 2 ** 31, "bias tràn int32"
         q = {"name": L["name"], "type": L["type"], "f_in": f_in, "fw": fw, "f_acc": f_acc,
              "w": wq, "b": bq.astype(np.int32)}
+        if wbits != 8:
+            q["wbits"] = wbits                               # thiếu khoá này = int8 (tương thích file cũ)
         if L["type"] == "conv":
             a_max = float(np.percentile(acts[i].numpy(), PERCENTILE))
             f_out = frac_bits_for(a_max, 255)
@@ -142,7 +149,10 @@ def torch_int_forward(q_layers, x_uint8):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arch", default=config.CHOSEN_ARCH)
-    arch = ap.parse_args().arch
+    ap.add_argument("--conv1-bits", type=int, choices=[8, 16], default=8,
+                    help="số bit trọng số của tầng conv1 (mặc định 8 như cũ)")
+    args = ap.parse_args()
+    arch = args.arch
     out_dir = config.export_dir_for(arch)        # A–D: model/export/ ; kiến trúc mới: model/export_<arch>/
 
     model = evaluate.load_model(arch)
@@ -161,13 +171,14 @@ def main():
     # 2–4) Hiệu chuẩn + lượng tử hoá
     rng = np.random.default_rng(config.SEED)
     calib = to_t(x_tr[rng.choice(len(x_tr), 2000, replace=False)])
-    q_layers = quantize(layers, calib)
+    q_layers = quantize(layers, calib, args.conv1_bits)
     save_qparams(q_layers, arch, out_dir)
     print("[2-4] Tham số từng tầng:")
     for q in q_layers:
         extra = (f"f_out {q['f_out']:2d} shift {q['shift']:2d}{' +pool' if q['pool'] else ''}"
                  if q["type"] == "conv" else "(logit int32)")
-        print(f"   {q['name']:6s} f_in {q['f_in']:2d} fw {q['fw']:2d} -> {extra}")
+        wb = f" (int{q['wbits']})" if "wbits" in q else ""
+        print(f"   {q['name']:6s} f_in {q['f_in']:2d} fw {q['fw']:2d}{wb} -> {extra}")
 
     # 5) Kiểm tra
     gl = golden_int.load_qparams(out_dir / "qparams.npz")
@@ -182,7 +193,8 @@ def main():
     rows = "\n".join(
         f"| {q['name']} | {q['f_in']} | {q['fw']} | {q.get('f_out', '–')} | {q.get('shift', '–')} | "
         f"{list(q['w'].shape)} | [{q['w'].min()}, {q['w'].max()}] |" for q in q_layers)
-    body = (f"Kiến trúc **{arch}**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, "
+    w_note = "int8" if args.conv1_bits == 8 else "int8 (riêng conv1: int16)"
+    body = (f"Kiến trúc **{arch}**. Trọng số {w_note}, activation uint8, bias/tổng tích luỹ int32, "
             f"thang là lũy thừa của 2 (theo từng tầng).\n\n"
             f"| Bước | Kết quả |\n|---|---|\n"
             f"| BN folding – sai khác logit lớn nhất | {diff:.1e} |\n"
