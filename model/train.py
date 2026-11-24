@@ -57,7 +57,8 @@ def distill_loss(logits, teacher_logits, hard_loss, alpha, temp):
     return (1 - alpha) * hard_loss + alpha * soft
 
 
-def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4.0):
+def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4.0,
+              extra=False, cifar_repeat=1):
     set_seed()
     model = net.build(arch)
     if teacher is not None:
@@ -67,7 +68,7 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
             p.requires_grad_(False)
         print(f"[{arch}] distillation từ {teacher} (alpha {kd_alpha}, T {kd_temp})")
     if recipe == "opt":
-        train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(model, epochs)
+        train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(model, epochs, extra, cifar_repeat)
     else:
         train_loader, val_loader, test_loader = data.get_loaders()
         # Hàm mất mát (loss function): cross-entropy, chuẩn cho bài toán phân loại
@@ -126,14 +127,14 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
     return test_acc
 
 
-def opt_recipe(model, epochs):
+def opt_recipe(model, epochs, extra=False, cifar_repeat=1):
     """Công thức huấn luyện tối ưu (chỉ dùng khi --recipe opt):
       - tăng cường mạnh: crop + flip + đổi sáng/tương phản + Cutout (data.strong_augment)
       - label smoothing 0.1: nhãn đích 0.925/0.025 thay vì 1/0 -> mô hình bớt "quá tự tin"
       - SGD momentum (nesterov), weight decay chỉ áp cho trọng số conv/linear (không cho BN, bias)
       - LR tăng tuyến tính trong OPT_WARMUP_EPOCHS epoch đầu (warmup), rồi giảm theo cosine về 0
     Các thay đổi này chỉ ảnh hưởng lúc huấn luyện; mạng suy luận vẫn chỉ gồm Conv/BN/ReLU/Pool/Linear."""
-    loaders = data.get_loaders(config.OPT_BATCH_SIZE, strong_aug=True)
+    loaders = data.get_loaders(config.OPT_BATCH_SIZE, strong_aug=True, extra=extra, cifar_repeat=cifar_repeat)
     loss_fn = nn.CrossEntropyLoss(label_smoothing=config.OPT_LABEL_SMOOTHING)
     decay = [p for p in model.parameters() if p.ndim > 1]
     no_decay = [p for p in model.parameters() if p.ndim <= 1]
@@ -203,11 +204,16 @@ def main():
                     help="(tuỳ chọn) tên kiến trúc đã có checkpoint dùng làm mạng thầy, ví dụ E_opt_cnn")
     ap.add_argument("--kd-alpha", type=float, default=0.7, help="tỉ trọng phần bắt chước thầy (0..1)")
     ap.add_argument("--kd-temp", type=float, default=4.0, help="nhiệt độ làm 'mềm' xác suất của thầy")
+    ap.add_argument("--extra-data", action="store_true",
+                    help="(chỉ với --recipe opt) ghép thêm ảnh ImageNet CINIC-10 vào tập train "
+                         "(tạo bằng prepare_cinic4.py); nên đặt tên lượt chạy dạng <arch>+cinic")
+    ap.add_argument("--cifar-repeat", type=int, default=1, help="lặp ảnh train CIFAR k lần khi có --extra-data")
     args = ap.parse_args()
     epochs = args.epochs or (config.OPT_EPOCHS if args.recipe == "opt" else config.EPOCHS)
     archs = list(net.ARCHS) if args.arch == "all" else [args.arch]
     for a in archs:
-        train_one(a, epochs, args.recipe, args.teacher, args.kd_alpha, args.kd_temp)
+        train_one(a, epochs, args.recipe, args.teacher, args.kd_alpha, args.kd_temp,
+                  args.extra_data, args.cifar_repeat)
 
 
 if __name__ == "__main__":

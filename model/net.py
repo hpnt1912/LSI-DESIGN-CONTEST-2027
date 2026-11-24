@@ -62,6 +62,8 @@ OPT_ARCHS = {
     "B3a_c4x4_64": ((16, True), (32, True), (64, True), (64, False)),       # + conv 64->64 ở 4x4
     "B3b_dbl8_64": ((16, True), (32, True), (64, False), (64, True)),       # 2 conv 64 ở 8x8
     "B3c_c4x4_128": ((16, True), (32, True), (64, True), (128, False)),     # + conv 64->128 ở 4x4
+    # E2_lite: như E nhưng cặp conv kép đặt ở 8x8 thay vì 16x16 -> cùng tham số, ít hơn 36% MAC.
+    "E2_lite": ((32, True), (64, True), (64, False), (128, True)),
 }
 
 
@@ -88,6 +90,9 @@ class VGGLite(nn.Module):
 
 
 def build(name):
+    # "<kiến trúc>+<nhãn>" (ví dụ "E_opt_cnn+cinic") = cùng kiến trúc, lượt huấn luyện khác
+    # -> checkpoint / thư mục export riêng, không ghi đè lượt cũ.
+    name = name.split("+")[0]
     if name in OPT_ARCHS:
         return VGGLite(OPT_ARCHS[name])
     channels, use_bn = ARCHS[name]

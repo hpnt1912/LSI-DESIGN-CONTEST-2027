@@ -88,11 +88,18 @@ def strong_augment(img):
     return img
 
 
-def get_loaders(batch_size=config.BATCH_SIZE, strong_aug=False):
+def get_loaders(batch_size=config.BATCH_SIZE, strong_aug=False, extra=False, cifar_repeat=1):
     """Trả về 3 DataLoader: train (có augment, xáo trộn), val, test.
-    strong_aug=True chỉ dùng cho công thức opt (train.py --recipe opt)."""
+    strong_aug=True chỉ dùng cho công thức opt (train.py --recipe opt).
+    extra=True: ghép thêm ảnh ImageNet của CINIC-10 (data/cinic4_extra.npz) vào tập TRAIN;
+      val và test vẫn chỉ là ảnh CIFAR như cũ. cifar_repeat=k: lặp ảnh train CIFAR k lần
+      để mô hình vẫn thấy đủ ảnh đúng "kiểu CIFAR"."""
     x_tr, y_tr, x_te, y_te = load_arrays()
     x_tr, y_tr, x_va, y_va = split_train_val(x_tr, y_tr)
+    if extra:
+        d = np.load(config.REPO_ROOT / "data" / "cinic4_extra.npz")
+        x_tr = np.concatenate([x_tr] * cifar_repeat + [d["x"]])
+        y_tr = np.concatenate([y_tr] * cifar_repeat + [d["y"]])
     g = torch.Generator().manual_seed(config.SEED)
     train = DataLoader(Cifar4(x_tr, y_tr, augment=True, strong=strong_aug), batch_size,
                        shuffle=True, generator=g)

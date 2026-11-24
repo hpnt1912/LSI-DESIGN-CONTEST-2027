@@ -44,6 +44,19 @@ python model/golden_int.py --arch E_opt_cnn
 python model/export.py --arch E_opt_cnn
 ```
 
+### Dữ liệu bổ sung CINIC-10 (tuỳ chọn)
+
+`prepare_cinic4.py` lấy **84.000 ảnh ImageNet 32×32** (21.000 ảnh/lớp) của 4 lớp từ CINIC-10, bỏ toàn bộ ảnh gốc
+CIFAR có trong CINIC (để không lộ tập test) và kiểm tra trùng pixel với tập test. Val/test vẫn là ảnh CIFAR.
+
+```bash
+# tải CINIC-10.tar.gz (687 MB) từ https://datashare.ed.ac.uk/handle/10283/3192, rồi:
+python model/prepare_cinic4.py --tar ~/Downloads/CINIC-10.tar.gz          # -> data/cinic4_extra.npz
+python model/train.py --arch "E2_lite+cinic" --recipe opt --extra-data --cifar-repeat 2 --epochs 30
+```
+
+Tên lượt chạy dạng `<kiến trúc>+<nhãn>` dùng chung kiến trúc nhưng có checkpoint / thư mục export riêng.
+
 Kiến trúc gốc A–D vẫn ghi vào `model/export/`; kiến trúc mới ghi vào `model/export_<tên>/` nên không đè bộ `.mem`
 baseline. Pipeline lượng tử hoá hỗ trợ thêm tầng conv **không có MaxPool** (khoá `pool` trong `qparams.json`;
 file `qparams` cũ không có khoá này được hiểu là có pool, nên kết quả baseline không đổi).
