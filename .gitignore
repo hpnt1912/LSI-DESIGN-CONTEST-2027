@@ -52,3 +52,7 @@ desktop.ini
 
 # ---- Tài liệu PDF của ban tổ chức (không phân phối lại) ----
 docs/*.pdf
+
+# File tạm của Word/WPS khi đang mở tài liệu
+~$*
+.~lock.*
