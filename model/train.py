@@ -46,17 +46,19 @@ def evaluate(model, loader):
     return total_loss / n, correct / n
 
 
-def train_one(arch, epochs):
+def train_one(arch, epochs, recipe="base"):
     set_seed()
-    train_loader, val_loader, test_loader = data.get_loaders()
     model = net.build(arch)
-
-    # Hàm mất mát (loss function): cross-entropy, chuẩn cho bài toán phân loại
-    loss_fn = nn.CrossEntropyLoss()
-    # Bộ tối ưu (optimizer): AdamW – biến thể của gradient descent tự điều chỉnh bước
-    opt = torch.optim.AdamW(model.parameters(), lr=config.LR, weight_decay=config.WEIGHT_DECAY)
-    # Lịch giảm tốc độ học (learning-rate schedule) dạng cosine: lớn lúc đầu, nhỏ dần về cuối
-    sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
+    if recipe == "opt":
+        train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(model, epochs)
+    else:
+        train_loader, val_loader, test_loader = data.get_loaders()
+        # Hàm mất mát (loss function): cross-entropy, chuẩn cho bài toán phân loại
+        loss_fn = nn.CrossEntropyLoss()
+        # Bộ tối ưu (optimizer): AdamW – biến thể của gradient descent tự điều chỉnh bước
+        opt = torch.optim.AdamW(model.parameters(), lr=config.LR, weight_decay=config.WEIGHT_DECAY)
+        # Lịch giảm tốc độ học (learning-rate schedule) dạng cosine: lớn lúc đầu, nhỏ dần về cuối
+        sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
 
     config.CKPT_DIR.mkdir(parents=True, exist_ok=True)
     ckpt_path = config.CKPT_DIR / f"{arch}.pt"
@@ -103,6 +105,31 @@ def train_one(arch, epochs):
     return test_acc
 
 
+def opt_recipe(model, epochs):
+    """Công thức huấn luyện tối ưu (chỉ dùng khi --recipe opt):
+      - tăng cường mạnh: crop + flip + đổi sáng/tương phản + Cutout (data.strong_augment)
+      - label smoothing 0.1: nhãn đích 0.925/0.025 thay vì 1/0 -> mô hình bớt "quá tự tin"
+      - SGD momentum (nesterov), weight decay chỉ áp cho trọng số conv/linear (không cho BN, bias)
+      - LR tăng tuyến tính trong OPT_WARMUP_EPOCHS epoch đầu (warmup), rồi giảm theo cosine về 0
+    Các thay đổi này chỉ ảnh hưởng lúc huấn luyện; mạng suy luận vẫn chỉ gồm Conv/BN/ReLU/Pool/Linear."""
+    loaders = data.get_loaders(config.OPT_BATCH_SIZE, strong_aug=True)
+    loss_fn = nn.CrossEntropyLoss(label_smoothing=config.OPT_LABEL_SMOOTHING)
+    decay = [p for p in model.parameters() if p.ndim > 1]
+    no_decay = [p for p in model.parameters() if p.ndim <= 1]
+    opt = torch.optim.SGD([{"params": decay, "weight_decay": config.OPT_WEIGHT_DECAY},
+                           {"params": no_decay, "weight_decay": 0.0}],
+                          lr=config.OPT_LR, momentum=config.OPT_MOMENTUM, nesterov=True)
+    warm = config.OPT_WARMUP_EPOCHS
+
+    def lr_factor(ep):                      # ep = số epoch đã xong (0, 1, ...)
+        if ep < warm:
+            return (ep + 1) / warm
+        return 0.5 * (1 + np.cos(np.pi * (ep - warm) / max(1, epochs - warm)))
+
+    sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_factor)
+    return (*loaders, loss_fn, opt, sched)
+
+
 def save_curves(arch, h):
     import matplotlib
     matplotlib.use("Agg")
@@ -145,12 +172,17 @@ def append_result(arch, model, val_acc, test_acc, epochs, minutes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arch", default=config.CHOSEN_ARCH, help="tên trong net.ARCHS hoặc 'all'")
-    ap.add_argument("--epochs", type=int, default=config.EPOCHS)
+    ap.add_argument("--arch", default=config.CHOSEN_ARCH,
+                    help="tên trong net.ARCHS / net.OPT_ARCHS, hoặc 'all' (4 kiến trúc gốc)")
+    ap.add_argument("--epochs", type=int, default=None,
+                    help=f"mặc định {config.EPOCHS} (base) hoặc {config.OPT_EPOCHS} (opt)")
+    ap.add_argument("--recipe", choices=["base", "opt"], default="base",
+                    help="base = công thức gốc; opt = SGD+warmup+cosine, label smoothing, Cutout, đổi sáng")
     args = ap.parse_args()
+    epochs = args.epochs or (config.OPT_EPOCHS if args.recipe == "opt" else config.EPOCHS)
     archs = list(net.ARCHS) if args.arch == "all" else [args.arch]
     for a in archs:
-        train_one(a, args.epochs)
+        train_one(a, epochs, args.recipe)
 
 
 if __name__ == "__main__":

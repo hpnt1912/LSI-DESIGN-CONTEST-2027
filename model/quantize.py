@@ -52,8 +52,12 @@ def fold_bn(model):
             w = w * k[:, None, None, None]
             b = k * (b - bn.running_mean.detach().double().numpy()) + bn.bias.detach().double().numpy()
             i += 1
-        i += 2                                    # bỏ qua ReLU và MaxPool (không có tham số)
-        layers.append({"name": f"conv{idx}", "type": "conv", "w": w, "b": b})
+        i += 1                                    # bỏ qua ReLU (không có tham số)
+        # MaxPool (nếu có) ngay sau ReLU. Kiến trúc gốc A–D: luôn có; VGGLite (E_...): có thể không.
+        pool = i < len(mods) and isinstance(mods[i], torch.nn.MaxPool2d)
+        if pool:
+            i += 1
+        layers.append({"name": f"conv{idx}", "type": "conv", "w": w, "b": b, "pool": pool})
         idx += 1
     fc = model.classifier
     layers.append({"name": "fc", "type": "linear",
@@ -70,7 +74,8 @@ def float_forward(layers, x):
         if L["type"] == "conv":
             x = F.relu(F.conv2d(x, w, b, padding=1))
             acts.append(x)
-            x = F.max_pool2d(x, 2)
+            if L.get("pool", True):
+                x = F.max_pool2d(x, 2)
         else:
             x = torch.flatten(x, 1) @ w.T + b
     return x, acts
@@ -96,15 +101,15 @@ def quantize(layers, calib_x):
         if L["type"] == "conv":
             a_max = float(np.percentile(acts[i].numpy(), PERCENTILE))
             f_out = frac_bits_for(a_max, 255)
-            q.update(f_out=f_out, shift=f_acc - f_out, a_max=a_max)
+            q.update(f_out=f_out, shift=f_acc - f_out, a_max=a_max, pool=bool(L.get("pool", True)))
             assert q["shift"] > 0
             f_in = f_out
         q_layers.append(q)
     return q_layers
 
 
-def save_qparams(q_layers, arch):
-    config.EXPORT_DIR.mkdir(parents=True, exist_ok=True)
+def save_qparams(q_layers, arch, out_dir=config.EXPORT_DIR):
+    out_dir.mkdir(parents=True, exist_ok=True)
     meta = {"arch": arch, "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
             "layers": [{k: v for k, v in q.items() if k not in ("w", "b")} for q in q_layers]}
     arrays = {}
@@ -113,8 +118,8 @@ def save_qparams(q_layers, arch):
         meta["layers"][i].update(w_shape=list(q["w"].shape),
                                  w_range=[int(q["w"].min()), int(q["w"].max())],
                                  b_range=[int(q["b"].min()), int(q["b"].max())])
-    np.savez(golden_int.QPARAMS_FILE, meta=json.dumps(meta), **arrays)
-    (config.EXPORT_DIR / "qparams.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
+    np.savez(out_dir / "qparams.npz", meta=json.dumps(meta), **arrays)
+    (out_dir / "qparams.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
 
 
 def torch_int_forward(q_layers, x_uint8):
@@ -127,7 +132,8 @@ def torch_int_forward(q_layers, x_uint8):
             acc = F.conv2d(x, w, b, padding=1)
             s = q["shift"]
             x = torch.floor((acc + 2 ** (s - 1)) / 2 ** s).clamp(0, 255)
-            x = F.max_pool2d(x, 2)
+            if q.get("pool", True):
+                x = F.max_pool2d(x, 2)
         else:
             x = torch.flatten(x, 1) @ w.T + b
     return x.numpy().astype(np.int64)
@@ -137,6 +143,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arch", default=config.CHOSEN_ARCH)
     arch = ap.parse_args().arch
+    out_dir = config.export_dir_for(arch)        # A–D: model/export/ ; kiến trúc mới: model/export_<arch>/
 
     model = evaluate.load_model(arch)
     x_tr, _, x_te, y_te = data.load_arrays()
@@ -155,14 +162,15 @@ def main():
     rng = np.random.default_rng(config.SEED)
     calib = to_t(x_tr[rng.choice(len(x_tr), 2000, replace=False)])
     q_layers = quantize(layers, calib)
-    save_qparams(q_layers, arch)
+    save_qparams(q_layers, arch, out_dir)
     print("[2-4] Tham số từng tầng:")
     for q in q_layers:
-        extra = f"f_out {q['f_out']:2d} shift {q['shift']:2d}" if q["type"] == "conv" else "(logit int32)"
+        extra = (f"f_out {q['f_out']:2d} shift {q['shift']:2d}{' +pool' if q['pool'] else ''}"
+                 if q["type"] == "conv" else "(logit int32)")
         print(f"   {q['name']:6s} f_in {q['f_in']:2d} fw {q['fw']:2d} -> {extra}")
 
     # 5) Kiểm tra
-    gl = golden_int.load_qparams()
+    gl = golden_int.load_qparams(out_dir / "qparams.npz")
     acc_int, pred_int = golden_int.accuracy(gl, x_te, y_te)
     logits_g = np.concatenate([golden_int.infer(x_te[i:i + 500], gl) for i in range(0, 4000, 500)])
     logits_t = torch_int_forward(q_layers, x_te)
@@ -184,8 +192,9 @@ def main():
             f"| Trùng dự đoán float ↔ số nguyên | {agree * 100:.1f}% |\n"
             f"| golden_int.py ↔ PyTorch trùng từng bit | {'Có' if bit_exact else 'KHÔNG'} |\n\n"
             f"| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |\n|---|---|---|---|---|---|---|\n{rows}")
-    report.update_section("Lượng tử hoá (int8)", body)
-    print(f"Đã lưu {golden_int.QPARAMS_FILE} và cập nhật results.md")
+    title = "Lượng tử hoá (int8)" if arch in config.BASELINE_ARCHS else f"Lượng tử hoá (int8) – {arch}"
+    report.update_section(title, body)
+    print(f"Đã lưu {out_dir / 'qparams.npz'} và cập nhật results.md")
 
 
 if __name__ == "__main__":

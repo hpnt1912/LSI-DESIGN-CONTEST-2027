@@ -14,7 +14,7 @@ Một tầng conv (cho mỗi kênh ra o, vị trí h, w):
     acc  = Σ_{c, ky, kx} Wq[o, c, ky, kx] × xq[c, h+ky-1, w+kx-1]  +  bq[o]     (số nguyên 32 bit)
     y    = (acc + 2^(s-1)) >> s          với s = f_in + fw - f_out   (dịch phải = chia 2^s, làm tròn)
     y    = min(max(y, 0), 255)           (ReLU + bão hoà về 8 bit không dấu)
-    sau đó MaxPool 2x2: lấy max của mỗi ô 2x2.
+    sau đó MaxPool 2x2: lấy max của mỗi ô 2x2 (nếu tầng có pool; kiến trúc VGGLite có tầng không pool).
 Tầng Linear cuối: logit = Σ Wq × xq + bq (int32), lớp dự đoán = argmax(logit).
 
 Chạy:  python model/golden_int.py      -> accuracy số nguyên trên tập test
@@ -73,7 +73,9 @@ def infer(images_uint8, layers, keep=False):
     for L in layers:
         if L["type"] == "conv":
             acc = conv3x3_int(x, L["w"], L["b"])
-            x = maxpool2(requant_relu(acc, L["shift"]))
+            x = requant_relu(acc, L["shift"])
+            if L.get("pool", True):              # qparams cũ (A–D) không có khoá "pool": luôn pool
+                x = maxpool2(x)
             trace.append((L["name"], x))
         else:                                                         # linear
             flat = x.reshape(len(x), -1)                              # thứ tự (kênh, hàng, cột)
@@ -89,9 +91,14 @@ def accuracy(layers, x_uint8, y, batch=500):
 
 
 def main():
+    import argparse
     import data
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--arch", default=config.CHOSEN_ARCH,
+                    help="đọc qparams.npz của kiến trúc này (A–D: model/export/, khác: model/export_<arch>/)")
+    arch = ap.parse_args().arch
     _, _, x_te, y_te = data.load_arrays()
-    layers = load_qparams()
+    layers = load_qparams(config.export_dir_for(arch) / "qparams.npz")
     acc, _ = accuracy(layers, x_te, y_te)
     print(f"Golden model số nguyên – accuracy test: {acc:.4f}")
     _, trace = infer(x_te[:1], layers, keep=True)

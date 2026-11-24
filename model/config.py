@@ -28,3 +28,23 @@ WEIGHT_DECAY = 5e-4         # phạt trọng số lớn (L2 regularization)
 # ---- Mô hình chọn để đưa xuống phần cứng ------------------------------------------
 # Tên phải có trong net.ARCHS. Đổi sau khi so sánh kiến trúc (xem results.md).
 CHOSEN_ARCH = "B_16_32_64"
+
+# ---- Thí nghiệm tối ưu độ chính xác (nhánh exp/opt-acc-90) -------------------------------
+# Chỉ dùng khi chạy  train.py --recipe opt ; công thức gốc ở trên không đổi.
+OPT_EPOCHS = 100            # số epoch mặc định của công thức opt
+OPT_BATCH_SIZE = 128
+OPT_LR = 0.05               # SGD momentum (nesterov) – thường tốt hơn AdamW cho CNN trên CIFAR
+OPT_MOMENTUM = 0.9
+OPT_WEIGHT_DECAY = 5e-4
+OPT_WARMUP_EPOCHS = 5       # tăng tuyến tính LR trong 5 epoch đầu, sau đó giảm theo cosine
+OPT_LABEL_SMOOTHING = 0.1
+OPT_CUTOUT = 12             # cạnh ô vuông bị xoá (Cutout) trên ảnh 32x32
+OPT_JITTER = 0.2            # biên độ đổi độ sáng / độ tương phản ngẫu nhiên (±20%)
+
+# Kiến trúc gốc ghi kết quả vào model/export/; kiến trúc mới ghi vào model/export_<tên>/
+# để không đè lên bộ .mem baseline.
+BASELINE_ARCHS = ("A_8_16_32", "B_16_32_64", "C_32_64_128", "D_16_32_64_noBN")
+
+
+def export_dir_for(arch):
+    return EXPORT_DIR if arch in BASELINE_ARCHS else REPO_ROOT / "model" / f"export_{arch}"

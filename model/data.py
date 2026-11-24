@@ -47,8 +47,9 @@ class Cifar4(Dataset):
     Mục đích: mô hình thấy nhiều biến thể -> bớt "học thuộc" (overfitting).
     """
 
-    def __init__(self, x, y, augment=False):
-        self.x, self.y, self.augment = x, y, augment
+    def __init__(self, x, y, augment=False, strong=False):
+        # strong=True (chỉ công thức opt): thêm đổi sáng/tương phản và Cutout sau crop + flip.
+        self.x, self.y, self.augment, self.strong = x, y, augment, strong
 
     def __len__(self):
         return len(self.x)
@@ -62,15 +63,39 @@ class Cifar4(Dataset):
             if np.random.rand() < 0.5:
                 img = img[:, ::-1]
             img = np.ascontiguousarray(img)
+            if self.strong:
+                img = strong_augment(img)
         return to_tensor(img), int(self.y[i])
 
 
-def get_loaders(batch_size=config.BATCH_SIZE):
-    """Trả về 3 DataLoader: train (có augment, xáo trộn), val, test."""
+def strong_augment(img):
+    """Tăng cường mạnh cho công thức opt. Kết quả vẫn là ảnh uint8 0..255 (đúng dạng phần cứng nhận).
+      - đổi độ sáng và độ tương phản ngẫu nhiên ±OPT_JITTER (giả lập điều kiện chụp khác nhau)
+      - Cutout: tô đen một ô vuông OPT_CUTOUT x OPT_CUTOUT ở vị trí ngẫu nhiên
+        (buộc mạng nhìn nhiều phần của con vật, không chỉ dựa vào một chi tiết)"""
+    j = config.OPT_JITTER
+    f = img.astype(np.float32)
+    bright = np.random.uniform(1 - j, 1 + j)
+    contrast = np.random.uniform(1 - j, 1 + j)
+    mean = f.mean()
+    f = (f - mean) * contrast + mean * bright
+    img = np.clip(np.round(f), 0, 255).astype(np.uint8)
+    s = config.OPT_CUTOUT
+    cy, cx = np.random.randint(0, 32, size=2)
+    y0, y1 = max(cy - s // 2, 0), min(cy + s // 2, 32)
+    x0, x1 = max(cx - s // 2, 0), min(cx + s // 2, 32)
+    img[y0:y1, x0:x1] = 0
+    return img
+
+
+def get_loaders(batch_size=config.BATCH_SIZE, strong_aug=False):
+    """Trả về 3 DataLoader: train (có augment, xáo trộn), val, test.
+    strong_aug=True chỉ dùng cho công thức opt (train.py --recipe opt)."""
     x_tr, y_tr, x_te, y_te = load_arrays()
     x_tr, y_tr, x_va, y_va = split_train_val(x_tr, y_tr)
     g = torch.Generator().manual_seed(config.SEED)
-    train = DataLoader(Cifar4(x_tr, y_tr, augment=True), batch_size, shuffle=True, generator=g)
+    train = DataLoader(Cifar4(x_tr, y_tr, augment=True, strong=strong_aug), batch_size,
+                       shuffle=True, generator=g)
     val = DataLoader(Cifar4(x_va, y_va), 256)
     test = DataLoader(Cifar4(x_te, y_te), 256)
     return train, val, test

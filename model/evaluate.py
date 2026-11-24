@@ -95,7 +95,9 @@ def main():
             f"| | " + " | ".join(config.CLASSES) + " |\n|---|---|---|---|---|\n" + cm_rows + "\n\n"
             f"Nhầm nhiều nhất: **{config.CLASSES[i]} → {config.CLASSES[j]}** ({off[i, j]} ảnh).\n\n"
             f"Hình: `figures/confusion_{arch}.png`, `figures/errors_{arch}.png`.")
-    report.update_section("Đánh giá chi tiết (float)", body)
+    title = ("Đánh giá chi tiết (float)" if arch in config.BASELINE_ARCHS
+             else f"Đánh giá chi tiết (float) – {arch}")
+    report.update_section(title, body)
     print(f"Đã lưu hình vào {config.FIG_DIR} và cập nhật {config.RESULTS_FILE.name}")
 
 
