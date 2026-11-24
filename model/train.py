@@ -58,9 +58,12 @@ def distill_loss(logits, teacher_logits, hard_loss, alpha, temp):
 
 
 def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4.0,
-              extra=False, cifar_repeat=1):
-    set_seed()
+              extra=False, cifar_repeat=1, init=None, lr=None, warmup=None, seed=config.SEED):
+    set_seed(seed)
     model = net.build(arch)
+    if init is not None:                         # tinh chỉnh (fine-tune) từ một lượt chạy đã có
+        model.load_state_dict(torch.load(config.CKPT_DIR / f"{init}.pt")["state_dict"])
+        print(f"[{arch}] khởi tạo từ checkpoint {init}")
     if teacher is not None:
         import evaluate as eval_mod              # nạp checkpoint mạng thầy (đặt tên khác để không
         teacher_model = eval_mod.load_model(teacher)  # che hàm evaluate() của file này)
@@ -68,7 +71,8 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
             p.requires_grad_(False)
         print(f"[{arch}] distillation từ {teacher} (alpha {kd_alpha}, T {kd_temp})")
     if recipe == "opt":
-        train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(model, epochs, extra, cifar_repeat)
+        train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(
+            model, epochs, extra, cifar_repeat, lr, warmup)
     else:
         train_loader, val_loader, test_loader = data.get_loaders()
         # Hàm mất mát (loss function): cross-entropy, chuẩn cho bài toán phân loại
@@ -127,7 +131,7 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
     return test_acc
 
 
-def opt_recipe(model, epochs, extra=False, cifar_repeat=1):
+def opt_recipe(model, epochs, extra=False, cifar_repeat=1, lr=None, warmup=None):
     """Công thức huấn luyện tối ưu (chỉ dùng khi --recipe opt):
       - tăng cường mạnh: crop + flip + đổi sáng/tương phản + Cutout (data.strong_augment)
       - label smoothing 0.1: nhãn đích 0.925/0.025 thay vì 1/0 -> mô hình bớt "quá tự tin"
@@ -140,8 +144,8 @@ def opt_recipe(model, epochs, extra=False, cifar_repeat=1):
     no_decay = [p for p in model.parameters() if p.ndim <= 1]
     opt = torch.optim.SGD([{"params": decay, "weight_decay": config.OPT_WEIGHT_DECAY},
                            {"params": no_decay, "weight_decay": 0.0}],
-                          lr=config.OPT_LR, momentum=config.OPT_MOMENTUM, nesterov=True)
-    warm = config.OPT_WARMUP_EPOCHS
+                          lr=lr or config.OPT_LR, momentum=config.OPT_MOMENTUM, nesterov=True)
+    warm = config.OPT_WARMUP_EPOCHS if warmup is None else warmup
 
     def lr_factor(ep):                      # ep = số epoch đã xong (0, 1, ...)
         if ep < warm:
@@ -208,12 +212,17 @@ def main():
                     help="(chỉ với --recipe opt) ghép thêm ảnh ImageNet CINIC-10 vào tập train "
                          "(tạo bằng prepare_cinic4.py); nên đặt tên lượt chạy dạng <arch>+cinic")
     ap.add_argument("--cifar-repeat", type=int, default=1, help="lặp ảnh train CIFAR k lần khi có --extra-data")
+    ap.add_argument("--init", default=None,
+                    help="tinh chỉnh: khởi tạo trọng số từ checkpoint của lượt chạy này (ví dụ E2_lite+cinic)")
+    ap.add_argument("--lr", type=float, default=None, help=f"LR ban đầu (mặc định {config.OPT_LR})")
+    ap.add_argument("--warmup", type=int, default=None, help=f"số epoch warmup (mặc định {config.OPT_WARMUP_EPOCHS})")
+    ap.add_argument("--seed", type=int, default=config.SEED, help="hạt giống ngẫu nhiên (để chạy lặp nhiều seed)")
     args = ap.parse_args()
     epochs = args.epochs or (config.OPT_EPOCHS if args.recipe == "opt" else config.EPOCHS)
     archs = list(net.ARCHS) if args.arch == "all" else [args.arch]
     for a in archs:
         train_one(a, epochs, args.recipe, args.teacher, args.kd_alpha, args.kd_temp,
-                  args.extra_data, args.cifar_repeat)
+                  args.extra_data, args.cifar_repeat, args.init, args.lr, args.warmup, args.seed)
 
 
 if __name__ == "__main__":
