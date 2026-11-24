@@ -57,10 +57,34 @@ def distill_loss(logits, teacher_logits, hard_loss, alpha, temp):
     return (1 - alpha) * hard_loss + alpha * soft
 
 
+def cutmix(x, y):
+    """CutMix (Yun 2019): dán một ô chữ nhật của ảnh khác (cùng batch) vào ảnh hiện tại.
+    Nhãn được trộn theo tỉ lệ diện tích: lam phần nhãn gốc, (1 - lam) phần nhãn ảnh được dán.
+    Buộc mạng nhận dạng từ nhiều bộ phận (tai, mõm, chân...) thay vì chỉ một chi tiết. Chỉ dùng khi huấn luyện."""
+    lam = np.random.beta(1.0, 1.0)
+    idx = torch.randperm(len(x))
+    h, w = x.shape[2:]
+    rh, rw = int(h * np.sqrt(1 - lam)), int(w * np.sqrt(1 - lam))
+    cy, cx = np.random.randint(h), np.random.randint(w)
+    y0, y1 = max(cy - rh // 2, 0), min(cy + rh // 2, h)
+    x0, x1 = max(cx - rw // 2, 0), min(cx + rw // 2, w)
+    x = x.clone()
+    x[:, :, y0:y1, x0:x1] = x[idx, :, y0:y1, x0:x1]
+    lam = 1 - (y1 - y0) * (x1 - x0) / (h * w)
+    return x, y[idx], lam
+
+
 def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4.0,
-              extra=False, cifar_repeat=1, init=None, lr=None, warmup=None, seed=config.SEED):
+              extra=False, cifar_repeat=1, init=None, lr=None, warmup=None, seed=config.SEED,
+              ema_decay=0.0, cutmix_prob=0.0):
     set_seed(seed)
     model = net.build(arch)
+    ema = None
+    if ema_decay > 0:
+        # EMA (exponential moving average): giữ thêm một bản trọng số = trung bình trượt của các bước gần đây.
+        # Bản trung bình thường ổn định và chính xác hơn bản cuối; chỉ khác lúc huấn luyện, suy luận như cũ.
+        from torch.optim.swa_utils import AveragedModel, get_ema_multi_avg_fn
+        ema = AveragedModel(model, multi_avg_fn=get_ema_multi_avg_fn(ema_decay), use_buffers=True)
     if init is not None:                         # tinh chỉnh (fine-tune) từ một lượt chạy đã có
         model.load_state_dict(torch.load(config.CKPT_DIR / f"{init}.pt")["state_dict"])
         print(f"[{arch}] khởi tạo từ checkpoint {init}")
@@ -92,8 +116,13 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
         model.train()                          # bật chế độ huấn luyện (BN dùng thống kê của batch)
         run_loss, correct, n = 0.0, 0, 0
         for x, y in train_loader:
+            mixed = cutmix_prob > 0 and np.random.rand() < cutmix_prob
+            if mixed:                          #    (tuỳ chọn) CutMix
+                x, y_b, lam = cutmix(x, y)
             logits = model(x)                  # 1) lan truyền xuôi (forward)
             loss = loss_fn(logits, y)          # 2) đo sai số
+            if mixed:
+                loss = lam * loss + (1 - lam) * loss_fn(logits, y_b)
             if teacher is not None:            #    (tuỳ chọn) cộng thêm phần bắt chước mạng thầy
                 with torch.no_grad():
                     t_logits = teacher_model(x)
@@ -101,12 +130,15 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
             opt.zero_grad()                    # 3) xoá gradient cũ
             loss.backward()                    # 4) lan truyền ngược (backpropagation) tính gradient
             opt.step()                         # 5) cập nhật trọng số
+            if ema is not None:
+                ema.update_parameters(model)
             run_loss += loss.item() * len(y)
             correct += (logits.argmax(1) == y).sum().item()
             n += len(y)
         sched.step()
 
-        val_loss, val_acc = evaluate(model, val_loader)
+        eval_model = model if ema is None else ema.module   # có EMA: chọn / lưu bản trung bình
+        val_loss, val_acc = evaluate(eval_model, val_loader)
         history["train_loss"].append(run_loss / n)
         history["train_acc"].append(correct / n)
         history["val_loss"].append(val_loss)
@@ -114,7 +146,7 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
         mark = ""
         if val_acc > best_val:                 # chỉ giữ mô hình tốt nhất trên validation
             best_val = val_acc
-            torch.save({"arch": arch, "state_dict": model.state_dict()}, ckpt_path)
+            torch.save({"arch": arch, "state_dict": eval_model.state_dict()}, ckpt_path)
             mark = " *"
         print(f"[{arch}] epoch {ep:2d}/{epochs}  train loss {run_loss / n:.3f} acc {correct / n:.3f}"
               f"  |  val loss {val_loss:.3f} acc {val_acc:.3f}{mark}  ({time.time() - t0:.0f}s)")
@@ -217,12 +249,16 @@ def main():
     ap.add_argument("--lr", type=float, default=None, help=f"LR ban đầu (mặc định {config.OPT_LR})")
     ap.add_argument("--warmup", type=int, default=None, help=f"số epoch warmup (mặc định {config.OPT_WARMUP_EPOCHS})")
     ap.add_argument("--seed", type=int, default=config.SEED, help="hạt giống ngẫu nhiên (để chạy lặp nhiều seed)")
+    ap.add_argument("--ema", type=float, default=0.0,
+                    help="hệ số EMA trọng số, ví dụ 0.999 (0 = tắt, như cũ); chọn/lưu bản trung bình")
+    ap.add_argument("--cutmix", type=float, default=0.0, help="xác suất áp CutMix cho mỗi batch (0 = tắt)")
     args = ap.parse_args()
     epochs = args.epochs or (config.OPT_EPOCHS if args.recipe == "opt" else config.EPOCHS)
     archs = list(net.ARCHS) if args.arch == "all" else [args.arch]
     for a in archs:
         train_one(a, epochs, args.recipe, args.teacher, args.kd_alpha, args.kd_temp,
-                  args.extra_data, args.cifar_repeat, args.init, args.lr, args.warmup, args.seed)
+                  args.extra_data, args.cifar_repeat, args.init, args.lr, args.warmup, args.seed,
+                  args.ema, args.cutmix)
 
 
 if __name__ == "__main__":

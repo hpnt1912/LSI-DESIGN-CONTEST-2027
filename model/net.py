@@ -64,6 +64,11 @@ OPT_ARCHS = {
     "B3c_c4x4_128": ((16, True), (32, True), (64, True), (128, False)),     # + conv 64->128 ở 4x4
     # E2_lite: như E nhưng cặp conv kép đặt ở 8x8 thay vì 16x16 -> cùng tham số, ít hơn 36% MAC.
     "E2_lite": ((32, True), (64, True), (64, False), (128, True)),
+    # Họ E3 (vòng tối ưu 3): giữ tốc độ ~E2_lite, trọng số <= ~150 KB.
+    "E3a_w112": ((32, True), (64, True), (80, False), (112, True)),        # rộng hơn: 150 KB, 13,7 tr MAC
+    "E3d_deep5": ((24, True), (48, True), (64, False), (64, False), (112, True)),  # 5 conv: 144 KB, 11,6 tr MAC
+    # CHỈ DÙNG LÀM MẠNG THẦY (distillation) – 522 KB, 49 tr MAC, KHÔNG đưa xuống phần cứng.
+    "T_wide_teacher": ((64, True), (128, True), (128, False), (256, True)),
 }
 
 
