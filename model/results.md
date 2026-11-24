@@ -39,16 +39,16 @@ Kiến trúc **B_16_32_64**. Trọng số int8, activation uint8, bias/tổng t�
 
 | Bước | Kết quả |
 |---|---|
-| BN folding – sai khác logit lớn nhất | 6.8e-06 |
-| Accuracy float (sau gộp BN) | 79.67% |
-| Accuracy số nguyên (golden model) | 79.83% |
-| Chênh lệch (số nguyên − float) | +0.15 điểm % |
-| Trùng dự đoán float ↔ số nguyên | 97.9% |
+| BN folding – sai khác logit lớn nhất | 6.2e-06 |
+| Accuracy float (sau gộp BN) | 80.23% |
+| Accuracy số nguyên (golden model) | 80.00% |
+| Chênh lệch (số nguyên − float) | -0.22 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.0% |
 | golden_int.py ↔ PyTorch trùng từng bit | Có |
 
 | Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
 |---|---|---|---|---|---|---|
-| conv1 | 8 | 4 | 5 | 7 | [16, 3, 3, 3] | [-83, 75] |
-| conv2 | 5 | 8 | 5 | 8 | [32, 16, 3, 3] | [-105, 95] |
-| conv3 | 5 | 8 | 5 | 8 | [64, 32, 3, 3] | [-69, 85] |
-| fc | 5 | 8 | – | – | [4, 1024] | [-49, 66] |
+| conv1 | 8 | 4 | 5 | 7 | [16, 3, 3, 3] | [-90, 78] |
+| conv2 | 5 | 8 | 5 | 8 | [32, 16, 3, 3] | [-116, 92] |
+| conv3 | 5 | 8 | 5 | 8 | [64, 32, 3, 3] | [-72, 94] |
+| fc | 5 | 9 | – | – | [4, 1024] | [-113, 122] |

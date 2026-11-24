@@ -8,7 +8,7 @@ Kiến trúc: **B_16_32_64**. Ảnh vào: pixel uint8, f=8 (x = pixel/256), th�
 | conv1 | conv | [16, 3, 3, 3] | 432 | 16 | 8 | 4 | 5 | 7 |
 | conv2 | conv | [32, 16, 3, 3] | 4608 | 32 | 5 | 8 | 5 | 8 |
 | conv3 | conv | [64, 32, 3, 3] | 18432 | 64 | 5 | 8 | 5 | 8 |
-| fc | linear | [4, 1024] | 4096 | 4 | 5 | 8 | – | – |
+| fc | linear | [4, 1024] | 4096 | 4 | 5 | 9 | – | – |
 
 ## Phép tính mỗi tầng conv (padding 1, stride 1)
 ```
