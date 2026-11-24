@@ -57,6 +57,26 @@ python model/train.py --arch "E2_lite+cinic" --recipe opt --extra-data --cifar-r
 
 Tên lượt chạy dạng `<kiến trúc>+<nhãn>` dùng chung kiến trúc nhưng có checkpoint / thư mục export riêng.
 
+### Kết luận (4.000 ảnh test CIFAR-4, chọn mô hình theo val, không theo test)
+
+| Mô hình | Vai trò | Test số nguyên | Test float | KB trọng số | Triệu MAC | ms/ảnh 16 DSP @100 MHz* |
+|---|---|---|---|---|---|---|
+| `B_16_32_64` | baseline | 79,83% | 79,67% | 27 | 2,8 | 1,8 |
+| `B2_16_32_64_opt` | B + công thức opt | 84,03% | 83,88% | 27 | 2,8 | 1,8 |
+| `B3c_c4x4_128+cinic_ft` | ưu tiên tốc độ | 87,20% | 87,08% | 103 | 4,0 | 2,5 |
+| **`E2_lite+cinic60_kdft`** | **cân bằng (khuyên dùng)** | **90,30%** | 90,32% | 135 | 12,7 | 7,9 |
+| `E_opt_cnn+cinic_ft` | ưu tiên độ chính xác | 90,60% | 90,65% | 135 | 19,8 | 12,4 |
+
+\*Ước lượng lý thuyết, DSP dùng 100%; thực tế chậm hơn 20–40%. Các mô hình `+cinic` dùng `--conv1-bits 16`
+(conv1 int16: gộp BN làm trọng số conv1 rất lớn, int8 làm mất 1,5–2 điểm %). Mọi mô hình khớp từng bit với golden.
+
+Cách tạo `E2_lite+cinic60_kdft`: 60 epoch trên CIFAR (x2) + 84k ảnh CINIC → tinh chỉnh 15 epoch chỉ trên CIFAR
+(lr 0,005) có distillation từ `E_opt_cnn+cinic_ft` → `quantize.py --conv1-bits 16`. File `.mem`: `model/export_E2_lite+cinic60_kdft/`.
+
+Độ ổn định: 5 lượt E2_lite tinh chỉnh (khác seed / số epoch / có-không KD) cho 89,45–90,30% số nguyên, trung bình
+89,86%; nghĩa là E2_lite ≈ 90% chứ chưa chắc chắn > 90% với mọi lần huấn luyện. Distillation không giúp đều
+(seed 7: 89,45% có KD so với 89,65% không KD). Dữ liệu CINIC không giúp mạng cỡ B (`B2+cinic_ft` 83,87%).
+
 Kiến trúc gốc A–D vẫn ghi vào `model/export/`; kiến trúc mới ghi vào `model/export_<tên>/` nên không đè bộ `.mem`
 baseline. Pipeline lượng tử hoá hỗ trợ thêm tầng conv **không có MaxPool** (khoá `pool` trong `qparams.json`;
 file `qparams` cũ không có khoá này được hiểu là có pool, nên kết quả baseline không đổi).
