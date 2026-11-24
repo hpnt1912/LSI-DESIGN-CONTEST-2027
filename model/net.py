@@ -57,6 +57,11 @@ OPT_ARCHS = {
     # Đối chứng: phần cứng y hệt B_16_32_64, chỉ khác công thức huấn luyện (--recipe opt).
     # Tên riêng để không ghi đè checkpoint / dòng kết quả của B gốc.
     "B2_16_32_64_opt": ((16, True), (32, True), (64, True)),
+    # Họ B3: giữ thân B, thêm sức chứa ở độ phân giải thấp (MAC rẻ, chỉ tốn thêm BRAM).
+    "B3_kd_16_32_64": ((16, True), (32, True), (64, True)),                 # y hệt B, học từ thầy (KD)
+    "B3a_c4x4_64": ((16, True), (32, True), (64, True), (64, False)),       # + conv 64->64 ở 4x4
+    "B3b_dbl8_64": ((16, True), (32, True), (64, False), (64, True)),       # 2 conv 64 ở 8x8
+    "B3c_c4x4_128": ((16, True), (32, True), (64, True), (128, False)),     # + conv 64->128 ở 4x4
 }
 
 

@@ -46,9 +46,26 @@ def evaluate(model, loader):
     return total_loss / n, correct / n
 
 
-def train_one(arch, epochs, recipe="base"):
+def distill_loss(logits, teacher_logits, hard_loss, alpha, temp):
+    """Chưng cất tri thức (knowledge distillation, Hinton 2015).
+    Học sinh vừa học nhãn thật (hard_loss), vừa bắt chước "độ tự tin" của mạng thầy trên cả 4 lớp
+    (ví dụ thầy cho rằng ảnh mèo này hơi giống chó) – thông tin mà nhãn 0/1 không có.
+    softmax chỉ dùng khi HUẤN LUYỆN; mạch suy luận vẫn chỉ lấy argmax của logit."""
+    soft = nn.functional.kl_div(nn.functional.log_softmax(logits / temp, dim=1),
+                                nn.functional.softmax(teacher_logits / temp, dim=1),
+                                reduction="batchmean") * temp * temp
+    return (1 - alpha) * hard_loss + alpha * soft
+
+
+def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4.0):
     set_seed()
     model = net.build(arch)
+    if teacher is not None:
+        import evaluate as eval_mod              # nạp checkpoint mạng thầy (đặt tên khác để không
+        teacher_model = eval_mod.load_model(teacher)  # che hàm evaluate() của file này)
+        for p in teacher_model.parameters():
+            p.requires_grad_(False)
+        print(f"[{arch}] distillation từ {teacher} (alpha {kd_alpha}, T {kd_temp})")
     if recipe == "opt":
         train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(model, epochs)
     else:
@@ -72,6 +89,10 @@ def train_one(arch, epochs, recipe="base"):
         for x, y in train_loader:
             logits = model(x)                  # 1) lan truyền xuôi (forward)
             loss = loss_fn(logits, y)          # 2) đo sai số
+            if teacher is not None:            #    (tuỳ chọn) cộng thêm phần bắt chước mạng thầy
+                with torch.no_grad():
+                    t_logits = teacher_model(x)
+                loss = distill_loss(logits, t_logits, loss, kd_alpha, kd_temp)
             opt.zero_grad()                    # 3) xoá gradient cũ
             loss.backward()                    # 4) lan truyền ngược (backpropagation) tính gradient
             opt.step()                         # 5) cập nhật trọng số
@@ -178,11 +199,15 @@ def main():
                     help=f"mặc định {config.EPOCHS} (base) hoặc {config.OPT_EPOCHS} (opt)")
     ap.add_argument("--recipe", choices=["base", "opt"], default="base",
                     help="base = công thức gốc; opt = SGD+warmup+cosine, label smoothing, Cutout, đổi sáng")
+    ap.add_argument("--teacher", default=None,
+                    help="(tuỳ chọn) tên kiến trúc đã có checkpoint dùng làm mạng thầy, ví dụ E_opt_cnn")
+    ap.add_argument("--kd-alpha", type=float, default=0.7, help="tỉ trọng phần bắt chước thầy (0..1)")
+    ap.add_argument("--kd-temp", type=float, default=4.0, help="nhiệt độ làm 'mềm' xác suất của thầy")
     args = ap.parse_args()
     epochs = args.epochs or (config.OPT_EPOCHS if args.recipe == "opt" else config.EPOCHS)
     archs = list(net.ARCHS) if args.arch == "all" else [args.arch]
     for a in archs:
-        train_one(a, epochs, args.recipe)
+        train_one(a, epochs, args.recipe, args.teacher, args.kd_alpha, args.kd_temp)
 
 
 if __name__ == "__main__":
