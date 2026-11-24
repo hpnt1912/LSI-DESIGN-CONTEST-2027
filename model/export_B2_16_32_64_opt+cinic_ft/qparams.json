@@ -1,0 +1,101 @@
+{
+  "arch": "B2_16_32_64_opt+cinic_ft",
+  "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
+  "layers": [
+    {
+      "name": "conv1",
+      "type": "conv",
+      "f_in": 8,
+      "fw": 11,
+      "f_acc": 19,
+      "wbits": 16,
+      "f_out": 4,
+      "shift": 15,
+      "a_max": 8.859503993220708,
+      "pool": true,
+      "w_shape": [
+        16,
+        3,
+        3,
+        3
+      ],
+      "w_range": [
+        -17241,
+        10604
+      ],
+      "b_range": [
+        -424777,
+        1044412
+      ]
+    },
+    {
+      "name": "conv2",
+      "type": "conv",
+      "f_in": 4,
+      "fw": 7,
+      "f_acc": 11,
+      "f_out": 5,
+      "shift": 6,
+      "a_max": 4.529190349625553,
+      "pool": true,
+      "w_shape": [
+        32,
+        16,
+        3,
+        3
+      ],
+      "w_range": [
+        -94,
+        69
+      ],
+      "b_range": [
+        -2670,
+        4869
+      ]
+    },
+    {
+      "name": "conv3",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 7,
+      "f_acc": 12,
+      "f_out": 6,
+      "shift": 6,
+      "a_max": 2.6082902168454543,
+      "pool": true,
+      "w_shape": [
+        64,
+        32,
+        3,
+        3
+      ],
+      "w_range": [
+        -59,
+        88
+      ],
+      "b_range": [
+        -4973,
+        3664
+      ]
+    },
+    {
+      "name": "fc",
+      "type": "linear",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "w_shape": [
+        4,
+        1024
+      ],
+      "w_range": [
+        -56,
+        78
+      ],
+      "b_range": [
+        -8950,
+        5607
+      ]
+    }
+  ]
+}
