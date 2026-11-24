@@ -17,6 +17,7 @@
 | E2_lite+cinic | 138,372 | 12,689,408 | 135.1 | 30 | 87.70% | 89.22% | 43.9 phút |
 | E2_lite+cinic_ft | 138,372 | 12,689,408 | 135.1 | 15 | 89.45% | 89.83% | 10.6 phút |
 | E_opt_cnn+cinic | 138,372 | 19,767,296 | 135.1 | 30 | 89.35% | 90.20% | 63.1 phút |
+| E_opt_cnn+cinic_ft | 138,372 | 19,767,296 | 135.1 | 15 | 90.10% | 90.65% | 11.6 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -343,3 +344,48 @@ Kiến trúc **E_opt_cnn+cinic**. Trọng số int8 (riêng conv1: int16), activ
 | conv3 | 5 | 8 | 6 | 7 | [64, 64, 3, 3] | [-107, 104] |
 | conv4 | 6 | 8 | 6 | 8 | [128, 64, 3, 3] | [-89, 118] |
 | fc | 6 | 8 | – | – | [4, 2048] | [-67, 77] |
+
+## Lượng tử hoá (int8) – E_opt_cnn+cinic_ft
+
+Kiến trúc **E_opt_cnn+cinic_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 3.6e-06 |
+| Accuracy float (sau gộp BN) | 90.65% |
+| Accuracy số nguyên (golden model) | 90.60% |
+| Chênh lệch (số nguyên − float) | -0.05 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.7% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 11 | 4 | 15 | [32, 3, 3, 3] | [-16702, 15556] |
+| conv2 | 4 | 8 | 6 | 6 | [64, 32, 3, 3] | [-77, 91] |
+| conv3 | 6 | 8 | 6 | 8 | [64, 64, 3, 3] | [-101, 100] |
+| conv4 | 6 | 7 | 6 | 7 | [128, 64, 3, 3] | [-45, 68] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-70, 76] |
+
+## Đánh giá chi tiết (float) – E_opt_cnn+cinic_ft
+
+Kiến trúc **E_opt_cnn+cinic_ft**, accuracy test **90.65%**.
+
+| Lớp | Accuracy |
+|---|---|
+| cat | 86.3% |
+| dog | 87.4% |
+| deer | 94.4% |
+| horse | 94.5% |
+
+Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
+
+| | cat | dog | deer | horse |
+|---|---|---|---|---|
+| **cat** | 863 | 97 | 31 | 9 |
+| **dog** | 88 | 874 | 32 | 6 |
+| **deer** | 25 | 13 | 944 | 18 |
+| **horse** | 16 | 26 | 13 | 945 |
+
+Nhầm nhiều nhất: **cat → dog** (97 ảnh).
+
+Hình: `figures/confusion_E_opt_cnn+cinic_ft.png`, `figures/errors_E_opt_cnn+cinic_ft.png`.

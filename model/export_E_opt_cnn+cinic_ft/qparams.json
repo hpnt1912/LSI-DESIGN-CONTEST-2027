@@ -1,0 +1,126 @@
+{
+  "arch": "E_opt_cnn+cinic_ft",
+  "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
+  "layers": [
+    {
+      "name": "conv1",
+      "type": "conv",
+      "f_in": 8,
+      "fw": 11,
+      "f_acc": 19,
+      "wbits": 16,
+      "f_out": 4,
+      "shift": 15,
+      "a_max": 8.149104489593192,
+      "pool": true,
+      "w_shape": [
+        32,
+        3,
+        3,
+        3
+      ],
+      "w_range": [
+        -16702,
+        15556
+      ],
+      "b_range": [
+        -948266,
+        650434
+      ]
+    },
+    {
+      "name": "conv2",
+      "type": "conv",
+      "f_in": 4,
+      "fw": 8,
+      "f_acc": 12,
+      "f_out": 6,
+      "shift": 6,
+      "a_max": 3.9694333951369924,
+      "pool": false,
+      "w_shape": [
+        64,
+        32,
+        3,
+        3
+      ],
+      "w_range": [
+        -77,
+        91
+      ],
+      "b_range": [
+        -6167,
+        5050
+      ]
+    },
+    {
+      "name": "conv3",
+      "type": "conv",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "f_out": 6,
+      "shift": 8,
+      "a_max": 2.890253838849868,
+      "pool": true,
+      "w_shape": [
+        64,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -101,
+        100
+      ],
+      "b_range": [
+        -24154,
+        18011
+      ]
+    },
+    {
+      "name": "conv4",
+      "type": "conv",
+      "f_in": 6,
+      "fw": 7,
+      "f_acc": 13,
+      "f_out": 6,
+      "shift": 7,
+      "a_max": 2.7102653484134063,
+      "pool": true,
+      "w_shape": [
+        128,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -45,
+        68
+      ],
+      "b_range": [
+        -15931,
+        4844
+      ]
+    },
+    {
+      "name": "fc",
+      "type": "linear",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "w_shape": [
+        4,
+        2048
+      ],
+      "w_range": [
+        -70,
+        76
+      ],
+      "b_range": [
+        -11407,
+        6107
+      ]
+    }
+  ]
+}
