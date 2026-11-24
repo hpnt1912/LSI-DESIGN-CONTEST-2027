@@ -59,9 +59,11 @@ Tên lượt chạy dạng `<kiến trúc>+<nhãn>` dùng chung kiến trúc nh�
 
 ### Kết luận (4.000 ảnh test CIFAR-4, chọn mô hình theo val, không theo test)
 
+Bảng đầy đủ (kèm ý nghĩa từng thư mục `export_*`): [`docs/so_sanh_mo_hinh.md`](../docs/so_sanh_mo_hinh.md).
+
 | Mô hình | Vai trò | Test số nguyên | Test float | KB trọng số | Triệu MAC | ms/ảnh 16 DSP @100 MHz* |
 |---|---|---|---|---|---|---|
-| `B_16_32_64` | baseline | 79,83% | 79,67% | 27 | 2,8 | 1,8 |
+| `B_16_32_64` | baseline | 80,00% | 80,23% | 27 | 2,8 | 1,8 |
 | `B2_16_32_64_opt` | B + công thức opt | 84,03% | 83,88% | 27 | 2,8 | 1,8 |
 | `B3c_c4x4_128+cinic_ft` | ưu tiên tốc độ | 87,20% | 87,08% | 103 | 4,0 | 2,5 |
 | **`E2_lite+cinic60_kdft`** | **cân bằng (khuyên dùng)** | **90,30%** | 90,32% | 135 | 12,7 | 7,9 |
