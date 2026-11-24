@@ -10,6 +10,10 @@
 | D_16_32_64_noBN | 27,684 | 2,805,760 | 27.0 | 30 | 75.10% | 73.88% | 3.5 phút |
 | E_opt_cnn | 138,372 | 19,767,296 | 135.1 | 100 | 89.10% | 88.58% | 15.7 phút |
 | B2_16_32_64_opt | 27,684 | 2,805,760 | 27.0 | 100 | 84.95% | 83.88% | 9.8 phút |
+| B3a_c4x4_64 | 64,612 | 3,395,584 | 63.1 | 100 | 87.15% | 84.35% | 12.2 phút |
+| B3_kd_16_32_64 | 27,684 | 2,805,760 | 27.0 | 100 | 86.45% | 83.58% | 24.5 phút |
+| B3b_dbl8_64 | 64,612 | 5,165,056 | 63.1 | 100 | 87.15% | 85.08% | 14.1 phút |
+| B3c_c4x4_128 | 105,636 | 3,989,504 | 103.2 | 100 | 86.50% | 85.30% | 13.0 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -142,3 +146,134 @@ Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
 Nhầm nhiều nhất: **cat → dog** (148 ảnh).
 
 Hình: `figures/confusion_B2_16_32_64_opt.png`, `figures/errors_B2_16_32_64_opt.png`.
+
+## Lượng tử hoá (int8) – B3c_c4x4_128
+
+Kiến trúc **B3c_c4x4_128**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 3.9e-06 |
+| Accuracy float (sau gộp BN) | 85.30% |
+| Accuracy số nguyên (golden model) | 85.17% |
+| Chênh lệch (số nguyên − float) | -0.12 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.0% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 5 | 5 | 8 | [16, 3, 3, 3] | [-110, 124] |
+| conv2 | 5 | 7 | 5 | 7 | [32, 16, 3, 3] | [-88, 91] |
+| conv3 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-69, 74] |
+| conv4 | 6 | 8 | 6 | 8 | [128, 64, 3, 3] | [-73, 80] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-106, 91] |
+
+## Lượng tử hoá (int8) – B3b_dbl8_64
+
+Kiến trúc **B3b_dbl8_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 3.6e-06 |
+| Accuracy float (sau gộp BN) | 85.08% |
+| Accuracy số nguyên (golden model) | 84.62% |
+| Chênh lệch (số nguyên − float) | -0.45 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 97.1% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 5 | 5 | 8 | [16, 3, 3, 3] | [-124, 113] |
+| conv2 | 5 | 7 | 5 | 7 | [32, 16, 3, 3] | [-68, 65] |
+| conv3 | 5 | 7 | 5 | 7 | [64, 32, 3, 3] | [-61, 72] |
+| conv4 | 5 | 8 | 6 | 7 | [64, 64, 3, 3] | [-66, 62] |
+| fc | 6 | 8 | – | – | [4, 1024] | [-61, 85] |
+
+## Lượng tử hoá (int8) – B3a_c4x4_64
+
+Kiến trúc **B3a_c4x4_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 3.2e-06 |
+| Accuracy float (sau gộp BN) | 84.35% |
+| Accuracy số nguyên (golden model) | 84.65% |
+| Chênh lệch (số nguyên − float) | +0.30 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.4% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 5 | 5 | 8 | [16, 3, 3, 3] | [-112, 127] |
+| conv2 | 5 | 7 | 6 | 6 | [32, 16, 3, 3] | [-68, 65] |
+| conv3 | 6 | 8 | 6 | 8 | [64, 32, 3, 3] | [-123, 121] |
+| conv4 | 6 | 7 | 5 | 8 | [64, 64, 3, 3] | [-39, 75] |
+| fc | 5 | 8 | – | – | [4, 1024] | [-112, 90] |
+
+## Lượng tử hoá (int8) – B3_kd_16_32_64
+
+Kiến trúc **B3_kd_16_32_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 4.3e-06 |
+| Accuracy float (sau gộp BN) | 83.58% |
+| Accuracy số nguyên (golden model) | 83.95% |
+| Chênh lệch (số nguyên − float) | +0.38 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.1% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 5 | 5 | 8 | [16, 3, 3, 3] | [-112, 120] |
+| conv2 | 5 | 7 | 5 | 7 | [32, 16, 3, 3] | [-74, 51] |
+| conv3 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-65, 84] |
+| fc | 6 | 8 | – | – | [4, 1024] | [-63, 92] |
+
+## Đánh giá chi tiết (float) – B3c_c4x4_128
+
+Kiến trúc **B3c_c4x4_128**, accuracy test **85.30%**.
+
+| Lớp | Accuracy |
+|---|---|
+| cat | 78.2% |
+| dog | 83.7% |
+| deer | 88.9% |
+| horse | 90.4% |
+
+Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
+
+| | cat | dog | deer | horse |
+|---|---|---|---|---|
+| **cat** | 782 | 141 | 55 | 22 |
+| **dog** | 104 | 837 | 35 | 24 |
+| **deer** | 42 | 40 | 889 | 29 |
+| **horse** | 32 | 35 | 29 | 904 |
+
+Nhầm nhiều nhất: **cat → dog** (141 ảnh).
+
+Hình: `figures/confusion_B3c_c4x4_128.png`, `figures/errors_B3c_c4x4_128.png`.
+
+## Đánh giá chi tiết (float) – B3b_dbl8_64
+
+Kiến trúc **B3b_dbl8_64**, accuracy test **85.08%**.
+
+| Lớp | Accuracy |
+|---|---|
+| cat | 73.7% |
+| dog | 84.5% |
+| deer | 91.5% |
+| horse | 90.6% |
+
+Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
+
+| | cat | dog | deer | horse |
+|---|---|---|---|---|
+| **cat** | 737 | 183 | 51 | 29 |
+| **dog** | 88 | 845 | 37 | 30 |
+| **deer** | 33 | 32 | 915 | 20 |
+| **horse** | 22 | 42 | 30 | 906 |
+
+Nhầm nhiều nhất: **cat → dog** (183 ảnh).
+
+Hình: `figures/confusion_B3b_dbl8_64.png`, `figures/errors_B3b_dbl8_64.png`.
