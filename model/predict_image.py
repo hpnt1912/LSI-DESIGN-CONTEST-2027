@@ -3,6 +3,7 @@
 Chạy:
     python model/predict_image.py duong/dan/anh.jpg            # 1 ảnh
     python model/predict_image.py model/real_images            # cả thư mục
+    python model/predict_image.py model/real_images --arch "E2_lite+cinic60_kdft"   # mô hình khác
 
 Nếu thư mục có dạng real_images/<tên lớp>/*.jpg (cat, dog, deer, horse) thì script tính luôn accuracy.
 
@@ -32,19 +33,29 @@ def load_32x32(path):
 
 
 def main():
-    if len(sys.argv) < 2:
+    # Tuỳ chọn --arch <tên> (mặc định config.CHOSEN_ARCH): dùng cả checkpoint float lẫn qparams số nguyên
+    # của đúng kiến trúc đó (A–D: model/export/, kiến trúc mới: model/export_<tên>/).
+    args = sys.argv[1:]
+    arch = config.CHOSEN_ARCH
+    if "--arch" in args:
+        i = args.index("--arch")
+        arch = args[i + 1]
+        del args[i:i + 2]
+    if not args:
         print(__doc__)
         return
-    target = Path(sys.argv[1])
+    target = Path(args[0])
     files = sorted(p for p in target.rglob("*") if p.suffix.lower() in EXTS) if target.is_dir() else [target]
     if not files:
         print("Không tìm thấy ảnh.")
         return
 
     imgs = np.stack([load_32x32(f) for f in files])
-    model = evaluate.load_model(config.CHOSEN_ARCH)
+    model = evaluate.load_model(arch)
     pred_f = evaluate.predict_all(model, imgs)
-    pred_i = golden_int.infer(imgs, golden_int.load_qparams()).argmax(1)
+    qparams = golden_int.load_qparams(config.export_dir_for(arch) / "qparams.npz")
+    pred_i = golden_int.infer(imgs, qparams).argmax(1)
+    print(f"Mô hình: {arch}")
 
     n_ok, n_lab = 0, 0
     for f, pf, pi in zip(files, pred_f, pred_i):
