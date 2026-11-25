@@ -81,6 +81,21 @@ def float_forward(layers, x):
     return x, acts
 
 
+def calib_amax(layers, x):
+    """Phân vị PERCENTILE của activation sau ReLU từng tầng conv, tính lần lượt từng tầng và bỏ ngay
+    activation của tầng trước (cho cùng kết quả như giữ tất cả, nhưng tốn ít RAM hơn nhiều với mạng lớn)."""
+    out = []
+    with torch.no_grad():
+        for L in layers:
+            if L["type"] != "conv":
+                break
+            y = F.relu(F.conv2d(x, torch.from_numpy(L["w"]), torch.from_numpy(L["b"]), padding=1))
+            out.append(float(np.percentile(y.numpy(), PERCENTILE)))
+            x = F.max_pool2d(y, 2) if L.get("pool", True) else y
+            del y
+    return out
+
+
 def frac_bits_for(max_abs, q_max):
     """Số bit phần lẻ f lớn nhất sao cho max_abs * 2^f <= q_max (càng lớn càng chính xác)."""
     return int(np.floor(np.log2(q_max / max_abs)))
@@ -90,7 +105,7 @@ def quantize(layers, calib_x, conv1_bits=8):
     """calib_x: tensor ảnh float (N,3,32,32). Trả về list tầng số nguyên + thông tin.
     conv1_bits=16: riêng tầng đầu dùng trọng số int16 (chỉ vài trăm trọng số; DSP48E1 nhân 25x18 bit
     nên int16 x uint8 vẫn vừa 1 DSP). Dùng khi gộp BN làm trọng số conv1 quá lớn -> fw nhỏ, sai số lớn."""
-    _, acts = float_forward(layers, calib_x.double())
+    a_maxes = calib_amax(layers, calib_x.double())
     q_layers, f_in = [], 8                                   # ảnh vào: pixel/256 -> 8 bit phần lẻ
     for i, L in enumerate(layers):
         wbits = conv1_bits if i == 0 else 8
@@ -106,7 +121,7 @@ def quantize(layers, calib_x, conv1_bits=8):
         if wbits != 8:
             q["wbits"] = wbits                               # thiếu khoá này = int8 (tương thích file cũ)
         if L["type"] == "conv":
-            a_max = float(np.percentile(acts[i].numpy(), PERCENTILE))
+            a_max = a_maxes[i]
             f_out = frac_bits_for(a_max, 255)
             q.update(f_out=f_out, shift=f_acc - f_out, a_max=a_max, pool=bool(L.get("pool", True)))
             assert q["shift"] > 0
@@ -163,7 +178,8 @@ def main():
     layers = fold_bn(model)
     with torch.no_grad():
         ref = torch.cat([model(to_t(x_te[i:i + 500]).float()) for i in range(0, 4000, 500)]).double()
-        fold, _ = float_forward(layers, to_t(x_te))
+        # chạy từng nhóm 500 ảnh: mạng lớn (E, E2…) chạy cả 4.000 ảnh float64 một lúc sẽ hết RAM
+        fold = torch.cat([float_forward(layers, to_t(x_te[i:i + 500]))[0] for i in range(0, 4000, 500)])
     diff = (ref - fold).abs().max().item()
     acc_float = (fold.argmax(1).numpy() == y_te).mean()
     print(f"[1] BN folding: sai khác logit lớn nhất {diff:.2e}, accuracy float {acc_float:.4f}")
@@ -184,7 +200,7 @@ def main():
     gl = golden_int.load_qparams(out_dir / "qparams.npz")
     acc_int, pred_int = golden_int.accuracy(gl, x_te, y_te)
     logits_g = np.concatenate([golden_int.infer(x_te[i:i + 500], gl) for i in range(0, 4000, 500)])
-    logits_t = torch_int_forward(q_layers, x_te)
+    logits_t = np.concatenate([torch_int_forward(q_layers, x_te[i:i + 500]) for i in range(0, 4000, 500)])
     bit_exact = np.array_equal(logits_g, logits_t)
     agree = (pred_int == fold.argmax(1).numpy()).mean()
     print(f"[5] accuracy số nguyên {acc_int:.4f} (float {acc_float:.4f}, chênh {(acc_int - acc_float) * 100:+.2f} điểm %)")

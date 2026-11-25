@@ -12,6 +12,7 @@ Dự án thi LSI Design Contest in Hokkaido 2027: phần cứng CNN phân loại
 - `docs/PLAN.md`: kế hoạch từng ngày, đánh dấu `[x]` khi xong.
 - `docs/HuongDan_MoHinh_CNN_Python.docx`: hướng dẫn chi tiết A–Z mô hình Python (người dùng học theo file này).
 - `docs/model_spec.md`: yêu cầu mô hình CNN.
+- `docs/KIEM_CHUNG.md` + `model/kiem_chung.py`: kiểm chứng 5 mô hình chính (B, B3c, E, E2, E3d); bảng tự sinh `docs/so_sanh_5_mo_hinh.md` (không sửa tay).
 - `docs/hardware.md`: tài nguyên XC7S25 (14.600 LUT, 80 DSP, 1.620 Kb BRAM), bảng chân ZERO7 (clock 20 MHz ở B13).
 - `docs/cnn23_reference.md`: lý thuyết CNN của cuộc thi lần 23 (đề yêu cầu tham khảo).
 - `docs/SETUP.md`: vị trí phần mềm, đường dẫn, checklist cài đặt (cập nhật khi môi trường thay đổi).
@@ -27,7 +28,7 @@ Dự án thi LSI Design Contest in Hokkaido 2027: phần cứng CNN phân loại
 - Python: PEP 8, dùng `pathlib`. Chạy script từ thư mục gốc repo.
 - Mô hình: chỉ dùng Conv 3×3, ReLU, MaxPool 2×2, Linear; output 4 logit, phần cứng lấy argmax.
 - Cố định seed (`torch.manual_seed`) để kết quả lặp lại được; ghi kết quả thử nghiệm vào `model/results.md`.
-- Lượng tử hóa: int8 trọng số, uint8 activation, int32 bias/accumulator, thang lũy thừa của 2 (xem `model/export/README.md`). `model/golden_int.py` là chuẩn bit-exact cho RTL.
+- Lượng tử hóa: int8 trọng số (các bản `+cinic`: riêng conv1 int16), uint8 activation, int32 bias/accumulator, thang lũy thừa của 2 (xem `model/export*/README.md`). `model/golden_int.py` là chuẩn bit-exact cho RTL.
 
 ## Lệnh hay dùng
 - Lint: `verilator --lint-only -Wall rtl/<file>.v`

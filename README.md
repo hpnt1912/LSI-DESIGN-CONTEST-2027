@@ -52,6 +52,7 @@ Kết quả nằm trong `reports/` (utilization, timing summary).
 
 - **Hướng dẫn A–Z mô hình Python (Word):** [`docs/HuongDan_MoHinh_CNN_Python.docx`](docs/HuongDan_MoHinh_CNN_Python.docx)
 - Kết quả thí nghiệm: [`model/results.md`](model/results.md)
+- **So sánh 5 mô hình chính** (tự cập nhật): [`docs/so_sanh_5_mo_hinh.md`](docs/so_sanh_5_mo_hinh.md) – cách kiểm chứng: [`docs/KIEM_CHUNG.md`](docs/KIEM_CHUNG.md)
 - Kế hoạch mô hình Python (2 tuần): [`docs/PLAN.md`](docs/PLAN.md)
 - Đặc tả mô hình: [`docs/model_spec.md`](docs/model_spec.md)
 - Chip XC7S25 và board ZERO7: [`docs/hardware.md`](docs/hardware.md)

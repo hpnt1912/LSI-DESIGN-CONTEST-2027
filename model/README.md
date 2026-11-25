@@ -23,6 +23,15 @@ Tất cả file dưới đây đã viết xong và chạy thử. Hướng dẫn 
 Chạy mọi script từ thư mục gốc repo, ví dụ `python model/train.py`.
 Dataset, checkpoint (`*.pt`) không commit; `model/export/` thì commit (file nhỏ, RTL cần dùng).
 
+## Kiểm chứng 5 mô hình chính (một lệnh)
+
+```bash
+python model/kiem_chung.py nhanh     # vài phút: golden model trên tham số có sẵn
+python model/kiem_chung.py tatca     # huấn luyện lại B, B3c, E, E2, E3d (~6 giờ), tự cập nhật + đẩy GitHub
+```
+Hướng dẫn: [`docs/KIEM_CHUNG.md`](../docs/KIEM_CHUNG.md). Bảng so sánh tự sinh:
+[`docs/so_sanh_5_mo_hinh.md`](../docs/so_sanh_5_mo_hinh.md).
+
 ## Thí nghiệm tối ưu độ chính xác (nhánh `exp/opt-acc-90`)
 
 Kiến trúc mới nằm trong `net.OPT_ARCHS`, tách khỏi 4 kiến trúc gốc (`--arch all` vẫn chỉ chạy A–D).

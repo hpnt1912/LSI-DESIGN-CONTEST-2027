@@ -79,15 +79,16 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
               ema_decay=0.0, cutmix_prob=0.0):
     set_seed(seed)
     model = net.build(arch)
+    if init is not None:                         # tinh chỉnh (fine-tune) từ một lượt chạy đã có
+        model.load_state_dict(torch.load(config.CKPT_DIR / f"{init}.pt")["state_dict"])
+        print(f"[{arch}] khởi tạo từ checkpoint {init}")
     ema = None
     if ema_decay > 0:
         # EMA (exponential moving average): giữ thêm một bản trọng số = trung bình trượt của các bước gần đây.
         # Bản trung bình thường ổn định và chính xác hơn bản cuối; chỉ khác lúc huấn luyện, suy luận như cũ.
+        # Tạo SAU khi nạp --init, để bản trung bình bắt đầu từ trọng số đã học chứ không từ số ngẫu nhiên.
         from torch.optim.swa_utils import AveragedModel, get_ema_multi_avg_fn
         ema = AveragedModel(model, multi_avg_fn=get_ema_multi_avg_fn(ema_decay), use_buffers=True)
-    if init is not None:                         # tinh chỉnh (fine-tune) từ một lượt chạy đã có
-        model.load_state_dict(torch.load(config.CKPT_DIR / f"{init}.pt")["state_dict"])
-        print(f"[{arch}] khởi tạo từ checkpoint {init}")
     if teacher is not None:
         import evaluate as eval_mod              # nạp checkpoint mạng thầy (đặt tên khác để không
         teacher_model = eval_mod.load_model(teacher)  # che hàm evaluate() của file này)

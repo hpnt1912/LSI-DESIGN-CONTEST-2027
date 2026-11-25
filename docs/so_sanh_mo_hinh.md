@@ -1,5 +1,8 @@
 # So sánh mô hình – nên dùng bản nào?
 
+> Bảng đầy đủ mọi thí nghiệm (số do AI chạy trên máy cloud). Nhóm đã chốt 5 mô hình chính –
+> xem bảng kiểm chứng tự cập nhật [`so_sanh_5_mo_hinh.md`](so_sanh_5_mo_hinh.md) và [`KIEM_CHUNG.md`](KIEM_CHUNG.md).
+
 Nhánh `exp/opt-acc-90`. Mọi con số đo trên **4.000 ảnh test CIFAR-4** (cat/dog/deer/horse), chọn mô hình theo tập
 validation, không theo test. "Số nguyên" = accuracy của `golden_int.py`, tức đúng kết quả phần cứng sẽ cho ra
 (mọi bản đều khớp từng bit với cách tính thứ hai bằng PyTorch).
