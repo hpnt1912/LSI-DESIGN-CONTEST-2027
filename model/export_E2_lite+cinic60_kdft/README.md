@@ -6,10 +6,10 @@ Kiến trúc: **E2_lite+cinic60_kdft**. Ảnh vào: pixel uint8, f=8 (x = pixel/
 | Tầng | Loại | Kích thước W | Bit W | Số W | Số bias | f_in | fw | f_out | shift | MaxPool | Đầu ra [C,H,W] |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | conv1 | conv | [32, 3, 3, 3] | int16 | 864 | 32 | 8 | 11 | 5 | 14 | có | [32, 16, 16] |
-| conv2 | conv | [64, 32, 3, 3] | int8 | 18432 | 64 | 5 | 7 | 6 | 6 | có | [64, 8, 8] |
+| conv2 | conv | [64, 32, 3, 3] | int8 | 18432 | 64 | 5 | 6 | 6 | 5 | có | [64, 8, 8] |
 | conv3 | conv | [64, 64, 3, 3] | int8 | 36864 | 64 | 6 | 7 | 5 | 8 | không | [64, 8, 8] |
 | conv4 | conv | [128, 64, 3, 3] | int8 | 73728 | 128 | 5 | 8 | 6 | 7 | có | [128, 4, 4] |
-| fc | linear | [4, 2048] | int8 | 8192 | 4 | 6 | 8 | – | – | – | [4] |
+| fc | linear | [4, 2048] | int8 | 8192 | 4 | 6 | 9 | – | – | – | [4] |
 
 ## Phép tính mỗi tầng conv (padding 1, stride 1)
 ```

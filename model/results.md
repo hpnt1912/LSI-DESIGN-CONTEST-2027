@@ -17,17 +17,17 @@
 | E2_lite+cinic_ft | 138,372 | 12,689,408 | 135.1 | 15 | 89.45% | 89.83% | 10.6 phút |
 | B2_16_32_64_opt+cinic | 27,684 | 2,805,760 | 27.0 | 30 | 83.45% | 82.53% | 23.1 phút |
 | B2_16_32_64_opt+cinic_ft | 27,684 | 2,805,760 | 27.0 | 15 | 85.70% | 84.15% | 1.8 phút |
-| E2_lite+cinic60 | 138,372 | 12,689,408 | 135.1 | 60 | 89.80% | 89.35% | 96.3 phút |
 | E2_lite+cinic_s2 | 138,372 | 12,689,408 | 135.1 | 30 | 87.95% | 89.30% | 44.9 phút |
 | E2_lite+cinic60_ft | 138,372 | 12,689,408 | 135.1 | 15 | 90.15% | 90.12% | 3.5 phút |
 | E2_lite+cinic_s2_ft | 138,372 | 12,689,408 | 135.1 | 15 | 89.00% | 89.72% | 3.8 phút |
-| E2_lite+cinic60_kdft | 138,372 | 12,689,408 | 135.1 | 15 | 90.20% | 90.33% | 3.3 phút |
 | E2_lite+cinic_s2_kdft | 138,372 | 12,689,408 | 135.1 | 15 | 89.15% | 89.50% | 3.5 phút |
 | B_16_32_64 | 27,684 | 2,805,760 | 27.0 | 30 | 81.55% | 80.23% | 3.4 phút |
 | B3c_c4x4_128+cinic | 105,636 | 3,989,504 | 103.2 | 30 | 86.20% | 86.65% | 26.8 phút |
 | B3c_c4x4_128+cinic_ft | 105,636 | 3,989,504 | 103.2 | 15 | 87.30% | 87.67% | 2.1 phút |
 | E_opt_cnn+cinic | 138,372 | 19,767,296 | 135.1 | 30 | 89.50% | 89.20% | 64.7 phút |
 | E_opt_cnn+cinic_ft | 138,372 | 19,767,296 | 135.1 | 15 | 90.45% | 90.45% | 5.3 phút |
+| E2_lite+cinic60 | 138,372 | 12,689,408 | 135.1 | 60 | 89.70% | 89.92% | 89.6 phút |
+| E2_lite+cinic60_kdft | 138,372 | 12,689,408 | 135.1 | 15 | 90.20% | 90.00% | 5.7 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -514,20 +514,20 @@ Kiến trúc **E2_lite+cinic60_kdft**. Trọng số int8 (riêng conv1: int16), 
 
 | Bước | Kết quả |
 |---|---|
-| BN folding – sai khác logit lớn nhất | 3.4e-06 |
-| Accuracy float (sau gộp BN) | 90.33% |
-| Accuracy số nguyên (golden model) | 90.30% |
-| Chênh lệch (số nguyên − float) | -0.02 điểm % |
-| Trùng dự đoán float ↔ số nguyên | 99.3% |
+| BN folding – sai khác logit lớn nhất | 3.2e-06 |
+| Accuracy float (sau gộp BN) | 90.00% |
+| Accuracy số nguyên (golden model) | 89.60% |
+| Chênh lệch (số nguyên − float) | -0.40 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.2% |
 | golden_int.py ↔ PyTorch trùng từng bit | Có |
 
 | Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
 |---|---|---|---|---|---|---|
-| conv1 | 8 | 11 | 5 | 14 | [32, 3, 3, 3] | [-28011, 19777] |
-| conv2 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-58, 118] |
-| conv3 | 6 | 7 | 5 | 8 | [64, 64, 3, 3] | [-56, 97] |
-| conv4 | 5 | 8 | 6 | 7 | [128, 64, 3, 3] | [-64, 99] |
-| fc | 6 | 8 | – | – | [4, 2048] | [-45, 64] |
+| conv1 | 8 | 11 | 5 | 14 | [32, 3, 3, 3] | [-29645, 20646] |
+| conv2 | 5 | 6 | 6 | 5 | [64, 32, 3, 3] | [-35, 74] |
+| conv3 | 6 | 7 | 5 | 8 | [64, 64, 3, 3] | [-55, 85] |
+| conv4 | 5 | 8 | 6 | 7 | [128, 64, 3, 3] | [-60, 82] |
+| fc | 6 | 9 | – | – | [4, 2048] | [-83, 125] |
 
 ## Lượng tử hoá (int8) – E2_lite+cinic_s2_kdft
 
@@ -552,24 +552,24 @@ Kiến trúc **E2_lite+cinic_s2_kdft**. Trọng số int8 (riêng conv1: int16),
 
 ## Đánh giá chi tiết (float) – E2_lite+cinic60_kdft
 
-Kiến trúc **E2_lite+cinic60_kdft**, accuracy test **90.33%**.
+Kiến trúc **E2_lite+cinic60_kdft**, accuracy test **90.00%**.
 
 | Lớp | Accuracy |
 |---|---|
-| cat | 87.5% |
-| dog | 85.4% |
-| deer | 94.4% |
-| horse | 94.0% |
+| cat | 82.0% |
+| dog | 87.2% |
+| deer | 95.4% |
+| horse | 95.4% |
 
 Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
 
 | | cat | dog | deer | horse |
 |---|---|---|---|---|
-| **cat** | 875 | 81 | 35 | 9 |
-| **dog** | 107 | 854 | 32 | 7 |
-| **deer** | 29 | 13 | 944 | 14 |
-| **horse** | 20 | 22 | 18 | 940 |
+| **cat** | 820 | 117 | 45 | 18 |
+| **dog** | 83 | 872 | 27 | 18 |
+| **deer** | 18 | 11 | 954 | 17 |
+| **horse** | 9 | 16 | 21 | 954 |
 
-Nhầm nhiều nhất: **dog → cat** (107 ảnh).
+Nhầm nhiều nhất: **cat → dog** (117 ảnh).
 
 Hình: `figures/confusion_E2_lite+cinic60_kdft.png`, `figures/errors_E2_lite+cinic60_kdft.png`.

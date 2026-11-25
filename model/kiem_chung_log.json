@@ -44,6 +44,11 @@
       "may": "LAPTOP-2RM30BH4",
       "int": 90.3,
       "khop": true
-    }
+    },
+    "buoc_xong": [],
+    "trang_thai": "laptop",
+    "ngay": "2026-11-25 16:59",
+    "may": "LAPTOP-2RM30BH4",
+    "ghi_chu": "Chạy bằng kiem_chung.py"
   }
 }
