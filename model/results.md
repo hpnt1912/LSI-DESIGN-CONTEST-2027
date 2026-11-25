@@ -28,6 +28,8 @@
 | E_opt_cnn+cinic_ft | 138,372 | 19,767,296 | 135.1 | 15 | 90.45% | 90.45% | 5.3 phút |
 | E2_lite+cinic60 | 138,372 | 12,689,408 | 135.1 | 60 | 89.70% | 89.92% | 89.6 phút |
 | E2_lite+cinic60_kdft | 138,372 | 12,689,408 | 135.1 | 15 | 90.20% | 90.00% | 5.7 phút |
+| E3d_deep5+cinic60 | 147,524 | 11,582,464 | 144.1 | 60 | 90.80% | 89.65% | 91.0 phút |
+| E3d_deep5+cinic60_kdft | 147,524 | 11,582,464 | 144.1 | 15 | 90.70% | 90.20% | 5.2 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -573,3 +575,49 @@ Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
 Nhầm nhiều nhất: **cat → dog** (117 ảnh).
 
 Hình: `figures/confusion_E2_lite+cinic60_kdft.png`, `figures/errors_E2_lite+cinic60_kdft.png`.
+
+## Đánh giá chi tiết (float) – E3d_deep5+cinic60_kdft
+
+Kiến trúc **E3d_deep5+cinic60_kdft**, accuracy test **90.20%**.
+
+| Lớp | Accuracy |
+|---|---|
+| cat | 83.9% |
+| dog | 87.0% |
+| deer | 94.1% |
+| horse | 95.8% |
+
+Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
+
+| | cat | dog | deer | horse |
+|---|---|---|---|---|
+| **cat** | 839 | 111 | 36 | 14 |
+| **dog** | 84 | 870 | 29 | 17 |
+| **deer** | 26 | 11 | 941 | 22 |
+| **horse** | 13 | 18 | 11 | 958 |
+
+Nhầm nhiều nhất: **cat → dog** (111 ảnh).
+
+Hình: `figures/confusion_E3d_deep5+cinic60_kdft.png`, `figures/errors_E3d_deep5+cinic60_kdft.png`.
+
+## Lượng tử hoá (int8) – E3d_deep5+cinic60_kdft
+
+Kiến trúc **E3d_deep5+cinic60_kdft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 3.9e-06 |
+| Accuracy float (sau gộp BN) | 90.20% |
+| Accuracy số nguyên (golden model) | 90.25% |
+| Chênh lệch (số nguyên − float) | +0.05 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.9% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 12 | 5 | 15 | [24, 3, 3, 3] | [-31559, 26464] |
+| conv2 | 5 | 7 | 5 | 7 | [48, 24, 3, 3] | [-91, 92] |
+| conv3 | 5 | 6 | 5 | 6 | [64, 48, 3, 3] | [-37, 69] |
+| conv4 | 5 | 8 | 5 | 8 | [64, 64, 3, 3] | [-81, 100] |
+| conv5 | 5 | 8 | 6 | 7 | [112, 64, 3, 3] | [-67, 83] |
+| fc | 6 | 8 | – | – | [4, 1792] | [-78, 57] |
