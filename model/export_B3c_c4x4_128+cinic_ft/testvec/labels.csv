@@ -8,7 +8,7 @@ index,label,label_name,pred,pred_name
 6,3,horse,3,horse
 7,2,deer,2,deer
 8,1,dog,1,dog
-9,2,deer,2,deer
+9,2,deer,1,dog
 10,1,dog,1,dog
 11,2,deer,2,deer
 12,1,dog,1,dog
