@@ -1,7 +1,7 @@
 # So sánh 5 mô hình chính – LSI Design Contest 2027
 
 > File này **tự sinh** bởi `python model/kiem_chung.py` – không sửa tay (sửa sẽ bị ghi đè).
-> Cập nhật lần cuối: 2026-11-25 12:58 trên máy `vm`.
+> Cập nhật lần cuối: 2026-11-25 13:14 trên máy `LAPTOP-2RM30BH4`.
 
 Mọi accuracy đo trên **4.000 ảnh test CIFAR-4**. "Test số nguyên" = kết quả của `golden_int.py`, tức đúng kết
 quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`](KIEM_CHUNG.md).
@@ -47,7 +47,12 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 
 ## Kiểm tra nhanh (golden model trên tham số có sẵn)
 
-Chưa chạy `python model/kiem_chung.py nhanh`.
+| Mô hình | Ngày | Máy | Test số nguyên | So với số đã ghi |
+|---|---|---|---|---|
+| B | 2026-11-25 13:13 | `LAPTOP-2RM30BH4` | 80,00% | khớp số đã ghi ✅ |
+| B3c | 2026-11-25 13:13 | `LAPTOP-2RM30BH4` | 87,20% | khớp số đã ghi ✅ |
+| E | 2026-11-25 13:14 | `LAPTOP-2RM30BH4` | 90,60% | khớp số đã ghi ✅ |
+| E2 | 2026-11-25 13:14 | `LAPTOP-2RM30BH4` | 90,30% | khớp số đã ghi ✅ |
 
 ## Ghi chú từng mô hình
 

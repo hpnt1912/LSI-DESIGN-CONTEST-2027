@@ -4,6 +4,36 @@
     "ngay": "2026-11-24",
     "may": "LAPTOP-2RM30BH4",
     "buoc_xong": [],
-    "ghi_chu": "Chạy tay theo file hướng dẫn (tuần 1 + tuần 2)"
+    "ghi_chu": "Chạy tay theo file hướng dẫn (tuần 1 + tuần 2)",
+    "nhanh": {
+      "ngay": "2026-11-25 13:13",
+      "may": "LAPTOP-2RM30BH4",
+      "int": 80.0,
+      "khop": true
+    }
+  },
+  "B3c": {
+    "nhanh": {
+      "ngay": "2026-11-25 13:13",
+      "may": "LAPTOP-2RM30BH4",
+      "int": 87.2,
+      "khop": true
+    }
+  },
+  "E": {
+    "nhanh": {
+      "ngay": "2026-11-25 13:14",
+      "may": "LAPTOP-2RM30BH4",
+      "int": 90.6,
+      "khop": true
+    }
+  },
+  "E2": {
+    "nhanh": {
+      "ngay": "2026-11-25 13:14",
+      "may": "LAPTOP-2RM30BH4",
+      "int": 90.3,
+      "khop": true
+    }
   }
 }
