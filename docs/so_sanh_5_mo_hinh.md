@@ -1,7 +1,7 @@
 # So sánh 5 mô hình chính – LSI Design Contest 2027
 
 > File này **tự sinh** bởi `python model/kiem_chung.py` – không sửa tay (sửa sẽ bị ghi đè).
-> Cập nhật lần cuối: 2026-11-25 13:14 trên máy `LAPTOP-2RM30BH4`.
+> Cập nhật lần cuối: 2026-11-25 13:29 trên máy `LAPTOP-2RM30BH4`.
 
 Mọi accuracy đo trên **4.000 ảnh test CIFAR-4**. "Test số nguyên" = kết quả của `golden_int.py`, tức đúng kết
 quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`](KIEM_CHUNG.md).
@@ -26,9 +26,9 @@ quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`]
 | Thời gian/ảnh – 64 DSP @ 100 MHz* | 0,4 ms | 0,6 ms | 3,1 ms | 2,0 ms | 1,8 ms |
 | Conv1 | int8 | int16 | int16 | int16 | int16 |
 | Dữ liệu cần | CIFAR | CIFAR + CINIC-10 | CIFAR + CINIC-10 | CIFAR + CINIC-10 | CIFAR + CINIC-10 |
-| Thời gian huấn luyện (theo results.md) | 4 phút | 46 phút | 75 phút | 100 phút | khoảng 2 giờ (ước tính, cần E làm thầy) |
+| Thời gian huấn luyện (theo results.md) | 3 phút | 46 phút | 75 phút | 100 phút | khoảng 2 giờ (ước tính, cần E làm thầy) |
 | Cần mạng thầy E | không | không | không | có | có |
-| **Trạng thái** | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-24) | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⛔ Chưa chạy – chỉ là đề xuất, chưa có số liệu |
+| **Trạng thái** | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 13:27) | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⛔ Chưa chạy – chỉ là đề xuất, chưa có số liệu |
 
 \*Ước lượng lý thuyết = MAC ÷ (số DSP × tần số), giả sử DSP bận 100%; mạch thật chậm hơn khoảng 20–40%.
 Clock gốc của board là 20 MHz; muốn 100 MHz phải dùng MMCM. Camera ~30 khung/giây = 33 ms/khung.
