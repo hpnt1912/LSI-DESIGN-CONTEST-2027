@@ -1,7 +1,7 @@
 # So sánh 5 mô hình chính – LSI Design Contest 2027
 
 > File này **tự sinh** bởi `python model/kiem_chung.py` – không sửa tay (sửa sẽ bị ghi đè).
-> Cập nhật lần cuối: 2026-11-25 14:07 trên máy `LAPTOP-2RM30BH4`.
+> Cập nhật lần cuối: 2026-11-25 15:21 trên máy `LAPTOP-2RM30BH4`.
 
 Mọi accuracy đo trên **4.000 ảnh test CIFAR-4**. "Test số nguyên" = kết quả của `golden_int.py`, tức đúng kết
 quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`](KIEM_CHUNG.md).
@@ -11,11 +11,11 @@ quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`]
 | | **B**<br>Cơ bản (~80%) | **B3c**<br>Nhanh | **E**<br>Chính xác cao (+ mạng thầy cho E2, E3d) | **E2**<br>Cân bằng ★ (khuyên dùng) | **E3d**<br>Thử nghiệm mới (5 conv) |
 |---|---|---|---|---|---|
 | Tên lượt chạy (thư mục `model/export*`) | `B_16_32_64` | `B3c_c4x4_128+cinic_ft` | `E_opt_cnn+cinic_ft` | `E2_lite+cinic60_kdft` | `E3d_deep5+cinic60_kdft` |
-| **Test số nguyên** (đúng kết quả FPGA) | **80,00%** | **87,60%** | **90,60%** | **90,30%** | – |
-| Test float (PyTorch) | 80,23% | 87,67% | 90,65% | 90,33% | – |
-| Val float (dùng để chọn) | 81,55% | 87,30% | 90,10% | 90,20% | – |
+| **Test số nguyên** (đúng kết quả FPGA) | **80,00%** | **87,60%** | **90,65%** | **90,30%** | – |
+| Test float (PyTorch) | 80,23% | 87,67% | 90,45% | 90,33% | – |
+| Val float (dùng để chọn) | 81,55% | 87,30% | 90,45% | 90,20% | – |
 | Số đã ghi trước đây (float / số nguyên) | 80,23% / 80,00% | 87,08% / 87,20% | 90,65% / 90,60% | 90,33% / 90,30% | – |
-| Accuracy từng lớp (số nguyên)<br>cat / dog / deer / horse | 68,5 / 78,6 / 87,3 / 85,6 | 79,7 / 85,2 / 93,1 / 92,4 | 88,3 / 85,8 / 93,8 / 94,5 | 88,3 / 85,3 / 94,1 / 93,5 | – |
+| Accuracy từng lớp (số nguyên)<br>cat / dog / deer / horse | 68,5 / 78,6 / 87,3 / 85,6 | 79,7 / 85,2 / 93,1 / 92,4 | 85,8 / 86,5 / 94,8 / 95,5 | 88,3 / 85,3 / 94,1 / 93,5 | – |
 | Số tầng conv | 3 | 4 | 4 | 4 | 5 |
 | Tham số | 27.684 | 105.636 | 138.372 | 138.372 | 147.524 |
 | Trọng số thật (W int8 – conv1 int16 nếu có; bias int32) | 27,4 KB | 104,3 KB | 136,8 KB | 136,8 KB | 145,6 KB |
@@ -26,9 +26,9 @@ quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`]
 | Thời gian/ảnh – 64 DSP @ 100 MHz* | 0,4 ms | 0,6 ms | 3,1 ms | 2,0 ms | 1,8 ms |
 | Conv1 | int8 | int16 | int16 | int16 | int16 |
 | Dữ liệu cần | CIFAR | CIFAR + CINIC-10 | CIFAR + CINIC-10 | CIFAR + CINIC-10 | CIFAR + CINIC-10 |
-| Thời gian huấn luyện (theo results.md) | 3 phút | 29 phút | 75 phút | 100 phút | khoảng 2 giờ (ước tính, cần E làm thầy) |
+| Thời gian huấn luyện (theo results.md) | 3 phút | 29 phút | 70 phút | 100 phút | khoảng 2 giờ (ước tính, cần E làm thầy) |
 | Cần mạng thầy E | không | không | không | có | có |
-| **Trạng thái** | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 13:34) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 14:06) | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⛔ Chưa chạy – chỉ là đề xuất, chưa có số liệu |
+| **Trạng thái** | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 13:34) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 14:06) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 15:20) | ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud | ⛔ Chưa chạy – chỉ là đề xuất, chưa có số liệu |
 
 \*Ước lượng lý thuyết = MAC ÷ (số DSP × tần số), giả sử DSP bận 100%; mạch thật chậm hơn khoảng 20–40%.
 Clock gốc của board là 20 MHz; muốn 100 MHz phải dùng MMCM. Camera ~30 khung/giây = 33 ms/khung.

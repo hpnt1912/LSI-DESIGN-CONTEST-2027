@@ -15,8 +15,6 @@
 | B3c_c4x4_128 | 105,636 | 3,989,504 | 103.2 | 100 | 86.50% | 85.30% | 13.0 phút |
 | E2_lite+cinic | 138,372 | 12,689,408 | 135.1 | 30 | 87.70% | 89.22% | 43.9 phút |
 | E2_lite+cinic_ft | 138,372 | 12,689,408 | 135.1 | 15 | 89.45% | 89.83% | 10.6 phút |
-| E_opt_cnn+cinic | 138,372 | 19,767,296 | 135.1 | 30 | 89.35% | 90.20% | 63.1 phút |
-| E_opt_cnn+cinic_ft | 138,372 | 19,767,296 | 135.1 | 15 | 90.10% | 90.65% | 11.6 phút |
 | B2_16_32_64_opt+cinic | 27,684 | 2,805,760 | 27.0 | 30 | 83.45% | 82.53% | 23.1 phút |
 | B2_16_32_64_opt+cinic_ft | 27,684 | 2,805,760 | 27.0 | 15 | 85.70% | 84.15% | 1.8 phút |
 | E2_lite+cinic60 | 138,372 | 12,689,408 | 135.1 | 60 | 89.80% | 89.35% | 96.3 phút |
@@ -28,6 +26,8 @@
 | B_16_32_64 | 27,684 | 2,805,760 | 27.0 | 30 | 81.55% | 80.23% | 3.4 phút |
 | B3c_c4x4_128+cinic | 105,636 | 3,989,504 | 103.2 | 30 | 86.20% | 86.65% | 26.8 phút |
 | B3c_c4x4_128+cinic_ft | 105,636 | 3,989,504 | 103.2 | 15 | 87.30% | 87.67% | 2.1 phút |
+| E_opt_cnn+cinic | 138,372 | 19,767,296 | 135.1 | 30 | 89.50% | 89.20% | 64.7 phút |
+| E_opt_cnn+cinic_ft | 138,372 | 19,767,296 | 135.1 | 15 | 90.45% | 90.45% | 5.3 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -362,42 +362,42 @@ Kiến trúc **E_opt_cnn+cinic_ft**. Trọng số int8 (riêng conv1: int16), ac
 
 | Bước | Kết quả |
 |---|---|
-| BN folding – sai khác logit lớn nhất | 3.6e-06 |
-| Accuracy float (sau gộp BN) | 90.65% |
-| Accuracy số nguyên (golden model) | 90.60% |
-| Chênh lệch (số nguyên − float) | -0.05 điểm % |
-| Trùng dự đoán float ↔ số nguyên | 98.7% |
+| BN folding – sai khác logit lớn nhất | 4.3e-06 |
+| Accuracy float (sau gộp BN) | 90.45% |
+| Accuracy số nguyên (golden model) | 90.65% |
+| Chênh lệch (số nguyên − float) | +0.20 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 99.0% |
 | golden_int.py ↔ PyTorch trùng từng bit | Có |
 
 | Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |
 |---|---|---|---|---|---|---|
-| conv1 | 8 | 11 | 4 | 15 | [32, 3, 3, 3] | [-16702, 15556] |
-| conv2 | 4 | 8 | 6 | 6 | [64, 32, 3, 3] | [-77, 91] |
-| conv3 | 6 | 8 | 6 | 8 | [64, 64, 3, 3] | [-101, 100] |
-| conv4 | 6 | 7 | 6 | 7 | [128, 64, 3, 3] | [-45, 68] |
-| fc | 6 | 8 | – | – | [4, 2048] | [-70, 76] |
+| conv1 | 8 | 11 | 4 | 15 | [32, 3, 3, 3] | [-20093, 15746] |
+| conv2 | 4 | 7 | 5 | 6 | [64, 32, 3, 3] | [-42, 69] |
+| conv3 | 5 | 8 | 6 | 7 | [64, 64, 3, 3] | [-73, 113] |
+| conv4 | 6 | 7 | 6 | 7 | [128, 64, 3, 3] | [-37, 79] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-69, 85] |
 
 ## Đánh giá chi tiết (float) – E_opt_cnn+cinic_ft
 
-Kiến trúc **E_opt_cnn+cinic_ft**, accuracy test **90.65%**.
+Kiến trúc **E_opt_cnn+cinic_ft**, accuracy test **90.45%**.
 
 | Lớp | Accuracy |
 |---|---|
-| cat | 86.3% |
-| dog | 87.4% |
-| deer | 94.4% |
-| horse | 94.5% |
+| cat | 85.5% |
+| dog | 86.0% |
+| deer | 94.9% |
+| horse | 95.4% |
 
 Ma trận nhầm lẫn (hàng = nhãn thật, cột = dự đoán):
 
 | | cat | dog | deer | horse |
 |---|---|---|---|---|
-| **cat** | 863 | 97 | 31 | 9 |
-| **dog** | 88 | 874 | 32 | 6 |
-| **deer** | 25 | 13 | 944 | 18 |
-| **horse** | 16 | 26 | 13 | 945 |
+| **cat** | 855 | 88 | 39 | 18 |
+| **dog** | 88 | 860 | 28 | 24 |
+| **deer** | 27 | 9 | 949 | 15 |
+| **horse** | 15 | 16 | 15 | 954 |
 
-Nhầm nhiều nhất: **cat → dog** (97 ảnh).
+Nhầm nhiều nhất: **cat → dog** (88 ảnh).
 
 Hình: `figures/confusion_E_opt_cnn+cinic_ft.png`, `figures/errors_E_opt_cnn+cinic_ft.png`.
 
