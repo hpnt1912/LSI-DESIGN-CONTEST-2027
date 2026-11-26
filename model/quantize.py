@@ -219,7 +219,7 @@ def main():
             f"| Chênh lệch (số nguyên − float) | {(acc_int - acc_float) * 100:+.2f} điểm % |\n"
             f"| Trùng dự đoán float ↔ số nguyên | {agree * 100:.1f}% |\n"
             f"| golden_int.py ↔ PyTorch trùng từng bit | {'Có' if bit_exact else 'KHÔNG'} |\n\n"
-            f"| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (int8) |\n|---|---|---|---|---|---|---|\n{rows}")
+            f"| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (số nguyên) |\n|---|---|---|---|---|---|---|\n{rows}")
     title = "Lượng tử hoá (int8)" if arch in config.BASELINE_ARCHS else f"Lượng tử hoá (int8) – {arch}"
     report.update_section(title, body)
     print(f"Đã lưu {out_dir / 'qparams.npz'} và cập nhật results.md")

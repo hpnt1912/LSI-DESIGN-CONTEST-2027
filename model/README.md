@@ -19,6 +19,9 @@ Tất cả file dưới đây đã viết xong và chạy thử. Hướng dẫn 
 | `export.py` | 12 | Xuất trọng số `.mem` + vector kiểm thử vào `model/export/` |
 | `predict_image.py` | 13 | Dự đoán ảnh thật trong `real_images/<lớp>/` |
 | `report.py` | – | Ghi một mục vào `results.md` |
+| `kiem_chung.py` | – | Chạy lại + kiểm chứng 5 mô hình chính, vẽ bảng so sánh (xem dưới) |
+| `anh_that.py` | 13 | Đo cả 5 mô hình chính trên `real_images/<lớp>/`, ghi mục "Ảnh thật" vào `results.md` |
+| `nhieu_seed.py` | – | Chạy thêm seed cho một mô hình chính, ghi trung bình ± độ lệch vào `results.md` |
 
 Chạy mọi script từ thư mục gốc repo, ví dụ `python model/train.py`.
 Dataset, checkpoint (`*.pt`) không commit; `model/export/` thì commit (file nhỏ, RTL cần dùng).

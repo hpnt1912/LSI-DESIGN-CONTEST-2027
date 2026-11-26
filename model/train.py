@@ -97,9 +97,9 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
         print(f"[{arch}] distillation từ {teacher} (alpha {kd_alpha}, T {kd_temp})")
     if recipe == "opt":
         train_loader, val_loader, test_loader, loss_fn, opt, sched = opt_recipe(
-            model, epochs, extra, cifar_repeat, lr, warmup)
+            model, epochs, extra, cifar_repeat, lr, warmup, seed)
     else:
-        train_loader, val_loader, test_loader = data.get_loaders()
+        train_loader, val_loader, test_loader = data.get_loaders(seed=seed)
         # Hàm mất mát (loss function): cross-entropy, chuẩn cho bài toán phân loại
         loss_fn = nn.CrossEntropyLoss()
         # Bộ tối ưu (optimizer): AdamW – biến thể của gradient descent tự điều chỉnh bước
@@ -164,20 +164,20 @@ def train_one(arch, epochs, recipe="base", teacher=None, kd_alpha=0.7, kd_temp=4
     return test_acc
 
 
-def opt_recipe(model, epochs, extra=False, cifar_repeat=1, lr=None, warmup=None):
+def opt_recipe(model, epochs, extra=False, cifar_repeat=1, lr=None, warmup=None, seed=config.SEED):
     """Công thức huấn luyện tối ưu (chỉ dùng khi --recipe opt):
       - tăng cường mạnh: crop + flip + đổi sáng/tương phản + Cutout (data.strong_augment)
       - label smoothing 0.1: nhãn đích 0.925/0.025 thay vì 1/0 -> mô hình bớt "quá tự tin"
       - SGD momentum (nesterov), weight decay chỉ áp cho trọng số conv/linear (không cho BN, bias)
       - LR tăng tuyến tính trong OPT_WARMUP_EPOCHS epoch đầu (warmup), rồi giảm theo cosine về 0
     Các thay đổi này chỉ ảnh hưởng lúc huấn luyện; mạng suy luận vẫn chỉ gồm Conv/BN/ReLU/Pool/Linear."""
-    loaders = data.get_loaders(config.OPT_BATCH_SIZE, strong_aug=True, extra=extra, cifar_repeat=cifar_repeat)
+    loaders = data.get_loaders(config.OPT_BATCH_SIZE, strong_aug=True, extra=extra, cifar_repeat=cifar_repeat, seed=seed)
     loss_fn = nn.CrossEntropyLoss(label_smoothing=config.OPT_LABEL_SMOOTHING)
     decay = [p for p in model.parameters() if p.ndim > 1]
     no_decay = [p for p in model.parameters() if p.ndim <= 1]
     opt = torch.optim.SGD([{"params": decay, "weight_decay": config.OPT_WEIGHT_DECAY},
-                           {"params": no_decay, "weight_decay": 0.0}],
-                          lr=lr or config.OPT_LR, momentum=config.OPT_MOMENTUM, nesterov=True)
+                           {"params": no_decay, "weight_decay": 0.0}], momentum=config.OPT_MOMENTUM, nesterov=True,
+                          lr=config.OPT_LR if lr is None else lr)   # "lr or ..." sẽ coi --lr 0 là "không truyền"
     warm = config.OPT_WARMUP_EPOCHS if warmup is None else warmup
 
     def lr_factor(ep):                      # ep = số epoch đã xong (0, 1, ...)

@@ -29,7 +29,7 @@ WEIGHT_DECAY = 5e-4         # phạt trọng số lớn (L2 regularization)
 # Tên phải có trong net.ARCHS. Đổi sau khi so sánh kiến trúc (xem results.md).
 CHOSEN_ARCH = "B_16_32_64"
 
-# ---- Thí nghiệm tối ưu độ chính xác (nhánh exp/opt-acc-90) -------------------------------
+# ---- Công thức huấn luyện opt (B3c, E, E2, E3d; ban đầu thử ở nhánh exp/opt-acc-90) -----------
 # Chỉ dùng khi chạy  train.py --recipe opt ; công thức gốc ở trên không đổi.
 OPT_EPOCHS = 100            # số epoch mặc định của công thức opt
 OPT_BATCH_SIZE = 128

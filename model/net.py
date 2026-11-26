@@ -47,7 +47,7 @@ class SmallCNN(nn.Module):
         return self.classifier(x)
 
 
-# ---- Kiến trúc tối ưu (nhánh exp/opt-acc-90) -------------------------------------------
+# ---- Kiến trúc tối ưu (B3c, E, E2, E3d; ban đầu thử ở nhánh exp/opt-acc-90) -------------
 # Tách riêng khỏi ARCHS để "--arch all" vẫn chỉ chạy 4 kiến trúc gốc.
 # Mỗi phần tử: (số kênh ra, có MaxPool 2x2 ngay sau hay không). Mọi conv đều 3x3, padding 1, có BN.
 #   E_opt_cnn:  3x32x32 -> conv32+P -> 32x16x16 -> conv64 -> conv64+P -> 64x8x8 -> conv128+P

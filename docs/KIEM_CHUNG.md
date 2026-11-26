@@ -35,16 +35,19 @@ python model/kiem_chung.py nhanh
 ```
 
 Script chạy golden model số nguyên trên tham số **đã có sẵn** của B, B3c, E, E2 và so với số đã ghi.
-Kết quả mong đợi (đã thử trên máy cloud, khớp hoàn toàn):
+Kết quả mong đợi (sau khi đã kiểm chứng cả 5 mô hình trên laptop 25–26/11):
 
 ```
 Mô hình  Số nguyên  Số đã ghi  Trạng thái
-B           80,00%     80,00%  ✅ Đã kiểm chứng ...
-B3c         87,20%     87,20%  ⚠️ Chưa kiểm chứng – số liệu do AI chạy trên máy cloud
-E           90,60%     90,60%  ⚠️ ...
-E2          90,30%     90,30%  ⚠️ ...
-E3d              –          –  ⛔ Chưa chạy ...
+B          80,00%     80,00%  ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 20:34)
+B3c        87,60%     87,20%  ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 21:06)
+E          90,65%     90,60%  ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 22:20)
+E2         89,60%     90,30%  ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 23:59)
+E3d        90,25%          –  ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-26 01:38)
 ```
+
+Cột "Số nguyên" là kết quả golden model trên tham số hiện có trên GitHub (của laptop). Cột "Số đã ghi" là số AI ghi **trước** khi
+kiểm chứng; chênh vài phần mười là bình thường (xem mục "Đọc kết quả").
 
 Bước này chứng minh các file tham số trên GitHub **cho đúng accuracy đã ghi**, nhưng chưa chứng minh tự huấn
 luyện lại được. Muốn vậy làm tiếp Bước 2–3.
@@ -84,6 +87,53 @@ Ubuntu (đóng cửa sổ là dừng). Nhật ký đầy đủ từng mô hình:
 
 **Bị dừng giữa chừng** (mất điện, lỗi, lỡ đóng cửa sổ): chạy lại **đúng lệnh cũ**. Script nhớ bước nào đã xong
 (`model/kiem_chung_log.json`) và chạy tiếp. Muốn làm lại từ đầu: thêm `--lam-lai`.
+
+## Bước 4 – Đo trên ảnh thật (1–2 giờ, không cần huấn luyện)
+
+Mọi accuracy ở trên đo trên ảnh CIFAR. Ngày thi là ảnh chụp thật, nên cần biết mô hình nào **tụt mạnh** trên ảnh thật.
+
+1. Hỏi ban tổ chức: ảnh ngày thi phát ở kích thước gốc hay đã thu về 32×32 (`docs/model_spec.md` dòng 17).
+2. Tạo thư mục và chép ảnh vào (mỗi lớp 20–30 ảnh, nhiều góc chụp và nền khác nhau; tốt nhất chụp bằng đúng camera dùng ngày thi):
+   ```bash
+   mkdir -p model/real_images/cat model/real_images/dog model/real_images/deer model/real_images/horse
+   cd model/real_images && explorer.exe . && cd ../..
+   ```
+3. Chạy (khoảng 3 phút):
+   ```bash
+   python model/anh_that.py
+   ```
+   Script chạy cả 5 mô hình bằng golden model số nguyên, cùng tiền xử lý như `predict_image.py`. Kết quả gồm accuracy, khoảng tin cậy
+   95%, accuracy từng lớp, mức chênh so với CIFAR, và danh sách ảnh mà cả 5 mô hình đều đoán sai. Tất cả được ghi vào mục
+   **"Ảnh thật (model/real_images)"** của `model/results.md`.
+4. Đẩy kết quả lên (chỉ `results.md`; ảnh giữ trên máy):
+   ```bash
+   git add model/results.md && git commit -m "Kết quả 5 mô hình trên ảnh thật" && git push
+   ```
+
+## Bước 5 – Chạy thêm seed cho mô hình đã chọn (qua đêm)
+
+Mỗi mô hình mới chạy 1 lần. E, E3d, E2 chênh nhau dưới 1 điểm, nhỏ hơn mức dao động giữa các lần chạy. Muốn kết luận chắc thì chạy thêm
+seed và báo cáo **trung bình ± độ lệch chuẩn**. Chỉ cần làm cho mô hình định chọn (sau Bước 4).
+
+```bash
+python model/nhieu_seed.py E3d
+```
+
+- Mặc định thêm seed 2 và 3 (cùng lượt chính seed 2027 là 3 lần). Mỗi seed mất khoảng bằng thời gian huấn luyện lượt chính (E3d khoảng
+  96 phút), nên 2 seed khoảng 3,2 giờ. Đổi seed: `--seeds 2 3 4`.
+- Mỗi seed chạy **đúng** các lệnh của lượt chính trong `kiem_chung.py`, chỉ thêm `--seed` và đặt tên lượt chạy có đuôi `_s2`, `_s3`,
+  nên **không đè** kết quả 5 mô hình chính. Mạng thầy của E2/E3d vẫn là E gốc.
+- Bị dừng: chạy lại đúng lệnh, script chạy tiếp từ bước dở.
+- Kết quả: mục **"Nhiều seed – <mã>"** trong `model/results.md`. Script **không** tự push; cuối cùng nó in lệnh `git` để bạn chạy.
+
+## Đã kiểm tra: ảnh gần trùng giữa CINIC và tập test
+
+`prepare_cinic4.py` chỉ loại ảnh trùng tuyệt đối. Đo lại bằng `documentation/tools/check_cinic_leak.py` (26/11) cho kết quả:
+- Khoảng 5–8% ảnh test có bản gần trùng trong CINIC.
+- Mô hình B, không học CINIC, cũng đoán nhóm ảnh đó đúng hơn hẳn (87% so với 79%), tức đó là ảnh dễ chứ không phải bị học thuộc.
+- Bỏ các ảnh trùng ra thì mọi mô hình giảm 0,1–0,4 điểm, B giảm nhiều nhất, và thứ tự các mô hình không đổi.
+
+**Không thấy dấu hiệu CINIC làm phồng kết quả.** Chi tiết và bảng số: `documentation/15_CODE_REVIEW_NOTES.md` mục B5.
 
 ## Script tự cập nhật những gì
 

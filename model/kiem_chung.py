@@ -306,7 +306,7 @@ TAG_OK, TAG_AI = "> ✅ **Chạy thật trên máy nhóm**", "> ⚠️ **Số do
 def laptop_runs(log, final_only=False):
     """Các lượt chạy thật trên máy nhóm. final_only=True: chỉ lượt cuối (đã đánh giá + lượng tử hoá trên máy
     nhóm); lượt trung gian (vd. E_opt_cnn+cinic) chỉ được huấn luyện lại, mục lượng tử hoá của nó vẫn là số AI."""
-    runs = set(LAPTOP_MANUAL)
+    runs = set(LAPTOP_MANUAL) | set(log.get("nhieu_seed", {}).get("runs", []))   # + lượt thêm seed (nhieu_seed.py)
     for k, m in MODELS.items():
         if log.get(k, {}).get("trang_thai") == "laptop":
             runs.update([m["run"]] if final_only else m["train_runs"] + [m["run"]])
@@ -321,7 +321,7 @@ def label_sections(text, log):
         ln = lines[i]
         out.append(ln)
         i += 1
-        if not ln.startswith("## ") or ln.startswith(SUMMARY_HEAD):
+        if not ln.startswith("## ") or ln.startswith((SUMMARY_HEAD, "## Ảnh thật", "## Nhiều seed")):  # mục tự ghi nguồn
             continue
         while i + 1 < len(lines) and lines[i] == "" and lines[i + 1].startswith((TAG_OK, TAG_AI)):
             i += 2                                            # bỏ nhãn cũ

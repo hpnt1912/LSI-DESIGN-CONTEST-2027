@@ -88,7 +88,7 @@ def strong_augment(img):
     return img
 
 
-def get_loaders(batch_size=config.BATCH_SIZE, strong_aug=False, extra=False, cifar_repeat=1):
+def get_loaders(batch_size=config.BATCH_SIZE, strong_aug=False, extra=False, cifar_repeat=1, seed=config.SEED):
     """Trả về 3 DataLoader: train (có augment, xáo trộn), val, test.
     strong_aug=True chỉ dùng cho công thức opt (train.py --recipe opt).
     extra=True: ghép thêm ảnh ImageNet của CINIC-10 (data/cinic4_extra.npz) vào tập TRAIN;
@@ -100,12 +100,19 @@ def get_loaders(batch_size=config.BATCH_SIZE, strong_aug=False, extra=False, cif
         d = np.load(config.REPO_ROOT / "data" / "cinic4_extra.npz")
         x_tr = np.concatenate([x_tr] * cifar_repeat + [d["x"]])
         y_tr = np.concatenate([y_tr] * cifar_repeat + [d["y"]])
-    g = torch.Generator().manual_seed(config.SEED)
+    g = torch.Generator().manual_seed(seed)     # thứ tự xáo theo --seed; tập val luôn tách theo config.SEED
     train = DataLoader(Cifar4(x_tr, y_tr, augment=True, strong=strong_aug), batch_size,
-                       shuffle=True, generator=g)
+                       shuffle=True, generator=g, worker_init_fn=seed_worker)
     val = DataLoader(Cifar4(x_va, y_va), 256)
     test = DataLoader(Cifar4(x_te, y_te), 256)
     return train, val, test
+
+
+def seed_worker(worker_id):
+    """Chỉ có tác dụng khi DataLoader chạy nhiều tiến trình (num_workers > 0; hiện dùng 0 nên không đổi gì).
+    Tăng cường dữ liệu dùng np.random; không có hàm này thì mọi worker mang cùng trạng thái np.random
+    và sinh ra cùng một chuỗi crop/lật/Cutout. PyTorch cho mỗi worker một torch.initial_seed() khác nhau."""
+    np.random.seed(torch.initial_seed() % 2**32)
 
 
 def main():
