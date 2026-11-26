@@ -1,14 +1,14 @@
 # So sánh 5 mô hình chính – LSI Design Contest 2027
 
 > File này **tự sinh** bởi `python model/kiem_chung.py` – không sửa tay (sửa sẽ bị ghi đè).
-> Cập nhật lần cuối: 2026-11-25 18:40 trên máy `LAPTOP-2RM30BH4`.
+> Cập nhật lần cuối: 2026-11-26 08:33. Số liệu từng mô hình lấy từ máy ghi ở dòng **Trạng thái**.
 
 Mọi accuracy đo trên **4.000 ảnh test CIFAR-4**. "Test số nguyên" = kết quả của `golden_int.py`, tức đúng kết
 quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`](KIEM_CHUNG.md).
 
 ## Bảng so sánh
 
-| | **B**<br>Cơ bản (~80%) | **B3c**<br>Nhanh | **E**<br>Chính xác cao (+ mạng thầy cho E2, E3d) | **E2**<br>Cân bằng ★ (khuyên dùng) | **E3d**<br>Thử nghiệm mới (5 conv) |
+| | **B**<br>Cơ bản (~80%) | **B3c**<br>Nhanh | **E**<br>Chính xác cao (+ mạng thầy cho E2, E3d) | **E2**<br>Cân bằng | **E3d**<br>Thử nghiệm mới (5 conv) |
 |---|---|---|---|---|---|
 | Tên lượt chạy (thư mục `model/export*`) | `B_16_32_64` | `B3c_c4x4_128+cinic_ft` | `E_opt_cnn+cinic_ft` | `E2_lite+cinic60_kdft` | `E3d_deep5+cinic60_kdft` |
 | **Test số nguyên** (đúng kết quả FPGA) | **80,00%** | **87,60%** | **90,65%** | **89,60%** | **90,25%** |
@@ -28,7 +28,7 @@ quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`]
 | Dữ liệu cần | CIFAR | CIFAR + CINIC-10 | CIFAR + CINIC-10 | CIFAR + CINIC-10 | CIFAR + CINIC-10 |
 | Thời gian huấn luyện (theo results.md) | 3 phút | 29 phút | 70 phút | 95 phút | 96 phút |
 | Cần mạng thầy E | không | không | không | có | có |
-| **Trạng thái** | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 13:34) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 14:06) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 15:20) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 16:59) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 18:38) |
+| **Trạng thái** | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 20:34) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 21:06) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 22:20) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 23:59) | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-26 01:38) |
 
 \*Ước lượng lý thuyết = MAC ÷ (số DSP × tần số), giả sử DSP bận 100%; mạch thật chậm hơn khoảng 20–40%.
 Clock gốc của board là 20 MHz; muốn 100 MHz phải dùng MMCM. Camera ~30 khung/giây = 33 ms/khung.
@@ -36,6 +36,14 @@ BRAM: chip có 1.620 Kb ≈ 202 KB; ước lượng = trọng số + bản đồ
 BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn. Trên ~80% là chật.
 
 ![So sánh độ chính xác và số phép tính](../model/figures/so_sanh_5_mo_hinh.png)
+
+## Nhận xét từ kết quả hiện tại (tự động)
+
+- **Chính xác nhất:** E – 90,65% (19,8 triệu MAC/ảnh).
+- **Gần bằng mức cao nhất (kém ≤ 0,5 điểm) mà ít phép tính nhất:** E3d – 90,25% với 11,6 triệu MAC/ảnh (ít hơn E 41%).
+- **Nhanh nhất trong nhóm ≥ 85%:** B3c – 87,60% với 4,0 triệu MAC/ảnh.
+- **Chênh với số đã ghi trước khi kiểm chứng (điểm %):** B +0,00, B3c +0,40, E +0,05, E2 -0,70. Chênh vài phần mười là dao động bình thường giữa hai máy.
+- Mỗi mô hình mới chạy **1 lần** (1 seed); chênh nhau dưới ~0,5 điểm chưa đủ để kết luận mô hình nào chắc chắn tốt hơn.
 
 ## Ý nghĩa trạng thái
 
@@ -49,10 +57,10 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 
 | Mô hình | Ngày | Máy | Test số nguyên | So với số đã ghi |
 |---|---|---|---|---|
-| B | 2026-11-25 13:13 | `LAPTOP-2RM30BH4` | 80,00% | khớp số đã ghi ✅ |
-| B3c | 2026-11-25 13:13 | `LAPTOP-2RM30BH4` | 87,20% | khớp số đã ghi ✅ |
-| E | 2026-11-25 13:14 | `LAPTOP-2RM30BH4` | 90,60% | khớp số đã ghi ✅ |
-| E2 | 2026-11-25 13:14 | `LAPTOP-2RM30BH4` | 90,30% | khớp số đã ghi ✅ |
+| B | 2026-11-25 20:13 | `LAPTOP-2RM30BH4` | 80,00% | khớp số đã ghi ✅ |
+| B3c | 2026-11-25 20:13 | `LAPTOP-2RM30BH4` | 87,20% | khớp số đã ghi ✅ |
+| E | 2026-11-25 20:14 | `LAPTOP-2RM30BH4` | 90,60% | khớp số đã ghi ✅ |
+| E2 | 2026-11-25 20:14 | `LAPTOP-2RM30BH4` | 90,30% | khớp số đã ghi ✅ |
 
 ## Ghi chú từng mô hình
 
@@ -60,17 +68,22 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 - **B3c – Nhanh:** thân B + 1 conv 64→128 ở 4×4. Ít phép tính nhất trong nhóm >85%. Cần CINIC.
 - **E – Chính xác cao:** VGG rút gọn, cặp conv kép ở 16×16. Chậm nhất; **cũng là mạng thầy** (distillation) cho
   E2 và E3d, nên phải chạy E trước.
-- **E2 – Cân bằng ★:** như E nhưng cặp conv kép ở 8×8 → cùng tham số, ít hơn 36% phép tính. Khuyên dùng.
-  Lưu ý: 5 lần huấn luyện trước đây cho 89,45–90,30% (≈90%, chưa chắc lần nào cũng >90%).
-- **E3d – Thử nghiệm:** 5 conv hẹp hơn (24/48/64/64/112), ít phép tính hơn E2. Nếu đạt ~90% thì nhanh hơn E2;
-  đổi lại RTL thêm 1 tầng.
+- **E2 – Cân bằng:** như E nhưng cặp conv kép ở 8×8 → cùng tham số, ít hơn 36% phép tính.
+  Trước khi kiểm chứng, 5 lần AI huấn luyện cho 89,45–90,30% (dao động giữa các lần chạy khá lớn).
+- **E3d – Thử nghiệm mới:** 5 conv hẹp hơn (24/48/64/64/112), ít phép tính nhất trong nhóm ~90%; đổi lại RTL
+  thêm 1 tầng. Lần đầu được huấn luyện chính là lần kiểm chứng trên máy nhóm (không có số AI để so).
 - Các bản `+cinic` học thêm 84.000 ảnh ImageNet 32×32 (CINIC-10), đã loại ảnh gốc CIFAR và ảnh trùng tập test;
   sau đó tinh chỉnh 15 epoch chỉ trên CIFAR. Conv1 dùng trọng số int16 (int16 × uint8 vẫn vừa 1 DSP48E1).
 - Lệnh huấn luyện các bản `+cinic` được dựng lại từ ghi chú commit của nhánh exp (`--cifar-repeat 2`,
   tinh chỉnh `--lr 0.005 --warmup 0`, distillation alpha 0,7 / T 4). Kết quả trên máy nhóm có thể lệch
   vài phần mười % so với số AI.
 
-## Hai kiến trúc mới không chọn (chưa chạy – chỉ là đánh giá trên giấy)
+## Các mô hình khác
+
+Mọi mô hình **ngoài 5 mô hình trên** trong `model/results.md` và `docs/so_sanh_mo_hinh.md` là **số do AI chạy trên
+máy cloud**, chưa huấn luyện lại trên máy nhóm – chỉ để tham khảo (trừ A, C, D: nhóm đã chạy tay ngày 24/11/2026).
+
+### Hai kiến trúc mới không chọn (chưa từng chạy – chỉ là đánh giá trên giấy)
 
 | Kiến trúc | Trọng số / MAC | Đánh giá |
 |---|---|---|

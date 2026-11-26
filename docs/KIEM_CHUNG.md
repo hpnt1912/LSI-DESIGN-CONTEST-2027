@@ -8,13 +8,15 @@ Bảng so sánh tự sinh: [`docs/so_sanh_5_mo_hinh.md`](so_sanh_5_mo_hinh.md).
 
 ## 5 mô hình
 
-| Mã | Vai trò | Lượt chạy cuối (thư mục `model/export*`) | Số đã ghi (số nguyên) | Trạng thái ban đầu |
+| Mã | Vai trò | Lượt chạy cuối (thư mục `model/export*`) | Số AI ghi trước khi kiểm chứng | **Kết quả trên laptop (25–26/11)** |
 |---|---|---|---|---|
-| `B` | Cơ bản (~80%) | `B_16_32_64` (`model/export/`) | 80,00% | ✅ đã chạy trên laptop |
-| `B3c` | Nhanh | `B3c_c4x4_128+cinic_ft` | 87,20% | ⚠️ số do AI chạy |
-| `E` | Chính xác cao + mạng thầy | `E_opt_cnn+cinic_ft` | 90,60% | ⚠️ số do AI chạy |
-| `E2` | Cân bằng ★ khuyên dùng | `E2_lite+cinic60_kdft` | 90,30% | ⚠️ số do AI chạy |
-| `E3d` | Thử nghiệm mới (5 conv) | `E3d_deep5+cinic60_kdft` | – | ⛔ chưa chạy lần nào |
+| `B` | Cơ bản (~80%) | `B_16_32_64` (`model/export/`) | 80,00% | ✅ **80,00%** |
+| `B3c` | Nhanh | `B3c_c4x4_128+cinic_ft` | 87,20% | ✅ **87,60%** |
+| `E` | Chính xác cao + mạng thầy | `E_opt_cnn+cinic_ft` | 90,60% | ✅ **90,65%** |
+| `E2` | Cân bằng | `E2_lite+cinic60_kdft` | 90,30% | ✅ **89,60%** |
+| `E3d` | Thử nghiệm mới (5 conv) | `E3d_deep5+cinic60_kdft` | – (chưa từng chạy) | ✅ **90,25%** |
+
+Số là test số nguyên (golden model). Trạng thái luôn mới nhất: [`docs/so_sanh_5_mo_hinh.md`](so_sanh_5_mo_hinh.md).
 
 ## Bước 0 – Chuẩn bị (mỗi lần mở máy)
 

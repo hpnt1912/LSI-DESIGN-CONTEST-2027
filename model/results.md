@@ -1,6 +1,23 @@
 # Kết quả thí nghiệm
 
+## 5 mô hình chính (đang dùng)
+
+> Mục này **tự sinh** bởi `python model/kiem_chung.py` (cập nhật 2026-11-26 08:33). Bảng đầy đủ: [`docs/so_sanh_5_mo_hinh.md`](../docs/so_sanh_5_mo_hinh.md); cách kiểm chứng: [`docs/KIEM_CHUNG.md`](../docs/KIEM_CHUNG.md).
+> Các bảng và mục bên dưới là nhật ký mọi thí nghiệm (kể cả mô hình không dùng).
+
+| Mã | Vai trò | Lượt chạy (tên mục chi tiết bên dưới) | Test float | Test số nguyên (FPGA) | MAC/ảnh | Trọng số | Trạng thái |
+|---|---|---|---|---|---|---|---|
+| **B** | Cơ bản (~80%) | `B_16_32_64` | 80,23% | **80,00%** | 2,8 triệu | 27,4 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 20:34) |
+| **B3c** | Nhanh | `B3c_c4x4_128+cinic_ft` | 87,67% | **87,60%** | 4,0 triệu | 104,3 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 21:06) |
+| **E** | Chính xác cao (+ mạng thầy cho E2, E3d) | `E_opt_cnn+cinic_ft` | 90,45% | **90,65%** | 19,8 triệu | 136,8 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 22:20) |
+| **E2** | Cân bằng | `E2_lite+cinic60_kdft` | 90,00% | **89,60%** | 12,7 triệu | 136,8 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 23:59) |
+| **E3d** | Thử nghiệm mới (5 conv) | `E3d_deep5+cinic60_kdft` | 90,20% | **90,25%** | 11,6 triệu | 145,6 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-26 01:38) |
+
 ## So sánh kiến trúc (float)
+
+> ✅ **Chạy thật trên máy nhóm**: `A_8_16_32`, `C_32_64_128`, `D_16_32_64_noBN`, `B_16_32_64`, `B3c_c4x4_128+cinic`, `B3c_c4x4_128+cinic_ft`, `E_opt_cnn+cinic`, `E_opt_cnn+cinic_ft`, `E2_lite+cinic60`, `E2_lite+cinic60_kdft`, `E3d_deep5+cinic60`, `E3d_deep5+cinic60_kdft`.
+
+> ⚠️ **Số do AI chạy trên máy cloud** – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo: `E_opt_cnn`, `B2_16_32_64_opt`, `B3a_c4x4_64`, `B3_kd_16_32_64`, `B3b_dbl8_64`, `B3c_c4x4_128`, `E2_lite+cinic`, `E2_lite+cinic_ft`, `B2_16_32_64_opt+cinic`, `B2_16_32_64_opt+cinic_ft`, `E2_lite+cinic_s2`, `E2_lite+cinic60_ft`, `E2_lite+cinic_s2_ft`, `E2_lite+cinic_s2_kdft`.
 
 | Kiến trúc | Tham số | MAC/ảnh | KB int8 | Epoch | Val acc | Test acc | Thời gian |
 |---|---|---|---|---|---|---|---|
@@ -33,6 +50,8 @@
 
 ## Đánh giá chi tiết (float)
 
+> ✅ **Chạy thật trên máy nhóm** (`B_16_32_64`).
+
 Kiến trúc **B_16_32_64**, accuracy test **80.23%**.
 
 | Lớp | Accuracy |
@@ -57,6 +76,8 @@ Hình: `figures/confusion_B_16_32_64.png`, `figures/errors_B_16_32_64.png`.
 
 ## Lượng tử hoá (int8)
 
+> ✅ **Chạy thật trên máy nhóm** (`B_16_32_64`).
+
 Kiến trúc **B_16_32_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -76,6 +97,8 @@ Kiến trúc **B_16_32_64**. Trọng số int8, activation uint8, bias/tổng t�
 | fc | 5 | 9 | – | – | [4, 1024] | [-113, 122] |
 
 ## Đánh giá chi tiết (float) – E_opt_cnn
+
+> ⚠️ **Số do AI chạy trên máy cloud** (`E_opt_cnn`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
 
 Kiến trúc **E_opt_cnn**, accuracy test **88.58%**.
 
@@ -101,6 +124,8 @@ Hình: `figures/confusion_E_opt_cnn.png`, `figures/errors_E_opt_cnn.png`.
 
 ## Lượng tử hoá (int8) – E_opt_cnn
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`E_opt_cnn`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **E_opt_cnn**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -122,6 +147,8 @@ Kiến trúc **E_opt_cnn**. Trọng số int8, activation uint8, bias/tổng tí
 
 ## Lượng tử hoá (int8) – B2_16_32_64_opt
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`B2_16_32_64_opt`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **B2_16_32_64_opt**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -141,6 +168,8 @@ Kiến trúc **B2_16_32_64_opt**. Trọng số int8, activation uint8, bias/tổ
 | fc | 6 | 8 | – | – | [4, 1024] | [-69, 78] |
 
 ## Đánh giá chi tiết (float) – B2_16_32_64_opt
+
+> ⚠️ **Số do AI chạy trên máy cloud** (`B2_16_32_64_opt`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
 
 Kiến trúc **B2_16_32_64_opt**, accuracy test **83.88%**.
 
@@ -166,6 +195,8 @@ Hình: `figures/confusion_B2_16_32_64_opt.png`, `figures/errors_B2_16_32_64_opt.
 
 ## Lượng tử hoá (int8) – B3c_c4x4_128
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`B3c_c4x4_128`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **B3c_c4x4_128**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -186,6 +217,8 @@ Kiến trúc **B3c_c4x4_128**. Trọng số int8, activation uint8, bias/tổng 
 | fc | 6 | 8 | – | – | [4, 2048] | [-106, 91] |
 
 ## Lượng tử hoá (int8) – B3b_dbl8_64
+
+> ⚠️ **Số do AI chạy trên máy cloud** (`B3b_dbl8_64`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
 
 Kiến trúc **B3b_dbl8_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
@@ -208,6 +241,8 @@ Kiến trúc **B3b_dbl8_64**. Trọng số int8, activation uint8, bias/tổng t
 
 ## Lượng tử hoá (int8) – B3a_c4x4_64
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`B3a_c4x4_64`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **B3a_c4x4_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -229,6 +264,8 @@ Kiến trúc **B3a_c4x4_64**. Trọng số int8, activation uint8, bias/tổng t
 
 ## Lượng tử hoá (int8) – B3_kd_16_32_64
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`B3_kd_16_32_64`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **B3_kd_16_32_64**. Trọng số int8, activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -248,6 +285,8 @@ Kiến trúc **B3_kd_16_32_64**. Trọng số int8, activation uint8, bias/tổn
 | fc | 6 | 8 | – | – | [4, 1024] | [-63, 92] |
 
 ## Đánh giá chi tiết (float) – B3c_c4x4_128
+
+> ⚠️ **Số do AI chạy trên máy cloud** (`B3c_c4x4_128`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
 
 Kiến trúc **B3c_c4x4_128**, accuracy test **85.30%**.
 
@@ -273,6 +312,8 @@ Hình: `figures/confusion_B3c_c4x4_128.png`, `figures/errors_B3c_c4x4_128.png`.
 
 ## Đánh giá chi tiết (float) – B3b_dbl8_64
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`B3b_dbl8_64`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **B3b_dbl8_64**, accuracy test **85.08%**.
 
 | Lớp | Accuracy |
@@ -297,6 +338,8 @@ Hình: `figures/confusion_B3b_dbl8_64.png`, `figures/errors_B3b_dbl8_64.png`.
 
 ## Lượng tử hoá (int8) – E2_lite+cinic
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`E2_lite+cinic`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **E2_lite+cinic**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -317,6 +360,8 @@ Kiến trúc **E2_lite+cinic**. Trọng số int8 (riêng conv1: int16), activat
 | fc | 6 | 8 | – | – | [4, 2048] | [-53, 75] |
 
 ## Lượng tử hoá (int8) – E2_lite+cinic_ft
+
+> ⚠️ **Số do AI chạy trên máy cloud** (`E2_lite+cinic_ft`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
 
 Kiến trúc **E2_lite+cinic_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
@@ -339,6 +384,8 @@ Kiến trúc **E2_lite+cinic_ft**. Trọng số int8 (riêng conv1: int16), acti
 
 ## Lượng tử hoá (int8) – E_opt_cnn+cinic
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`E_opt_cnn+cinic`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **E_opt_cnn+cinic**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -360,6 +407,8 @@ Kiến trúc **E_opt_cnn+cinic**. Trọng số int8 (riêng conv1: int16), activ
 
 ## Lượng tử hoá (int8) – E_opt_cnn+cinic_ft
 
+> ✅ **Chạy thật trên máy nhóm** (`E_opt_cnn+cinic_ft`).
+
 Kiến trúc **E_opt_cnn+cinic_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -380,6 +429,8 @@ Kiến trúc **E_opt_cnn+cinic_ft**. Trọng số int8 (riêng conv1: int16), ac
 | fc | 6 | 8 | – | – | [4, 2048] | [-69, 85] |
 
 ## Đánh giá chi tiết (float) – E_opt_cnn+cinic_ft
+
+> ✅ **Chạy thật trên máy nhóm** (`E_opt_cnn+cinic_ft`).
 
 Kiến trúc **E_opt_cnn+cinic_ft**, accuracy test **90.45%**.
 
@@ -405,6 +456,8 @@ Hình: `figures/confusion_E_opt_cnn+cinic_ft.png`, `figures/errors_E_opt_cnn+cin
 
 ## Lượng tử hoá (int8) – B3c_c4x4_128+cinic_ft
 
+> ✅ **Chạy thật trên máy nhóm** (`B3c_c4x4_128+cinic_ft`).
+
 Kiến trúc **B3c_c4x4_128+cinic_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -425,6 +478,8 @@ Kiến trúc **B3c_c4x4_128+cinic_ft**. Trọng số int8 (riêng conv1: int16),
 | fc | 6 | 8 | – | – | [4, 2048] | [-83, 74] |
 
 ## Đánh giá chi tiết (float) – B3c_c4x4_128+cinic_ft
+
+> ✅ **Chạy thật trên máy nhóm** (`B3c_c4x4_128+cinic_ft`).
 
 Kiến trúc **B3c_c4x4_128+cinic_ft**, accuracy test **87.67%**.
 
@@ -450,6 +505,8 @@ Hình: `figures/confusion_B3c_c4x4_128+cinic_ft.png`, `figures/errors_B3c_c4x4_1
 
 ## Lượng tử hoá (int8) – B2_16_32_64_opt+cinic_ft
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`B2_16_32_64_opt+cinic_ft`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **B2_16_32_64_opt+cinic_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -469,6 +526,8 @@ Kiến trúc **B2_16_32_64_opt+cinic_ft**. Trọng số int8 (riêng conv1: int1
 | fc | 6 | 8 | – | – | [4, 1024] | [-56, 78] |
 
 ## Lượng tử hoá (int8) – E2_lite+cinic60_ft
+
+> ⚠️ **Số do AI chạy trên máy cloud** (`E2_lite+cinic60_ft`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
 
 Kiến trúc **E2_lite+cinic60_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
@@ -491,6 +550,8 @@ Kiến trúc **E2_lite+cinic60_ft**. Trọng số int8 (riêng conv1: int16), ac
 
 ## Lượng tử hoá (int8) – E2_lite+cinic_s2_ft
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`E2_lite+cinic_s2_ft`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **E2_lite+cinic_s2_ft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -511,6 +572,8 @@ Kiến trúc **E2_lite+cinic_s2_ft**. Trọng số int8 (riêng conv1: int16), a
 | fc | 6 | 8 | – | – | [4, 2048] | [-49, 82] |
 
 ## Lượng tử hoá (int8) – E2_lite+cinic60_kdft
+
+> ✅ **Chạy thật trên máy nhóm** (`E2_lite+cinic60_kdft`).
 
 Kiến trúc **E2_lite+cinic60_kdft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
@@ -533,6 +596,8 @@ Kiến trúc **E2_lite+cinic60_kdft**. Trọng số int8 (riêng conv1: int16), 
 
 ## Lượng tử hoá (int8) – E2_lite+cinic_s2_kdft
 
+> ⚠️ **Số do AI chạy trên máy cloud** (`E2_lite+cinic_s2_kdft`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.
+
 Kiến trúc **E2_lite+cinic_s2_kdft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -553,6 +618,8 @@ Kiến trúc **E2_lite+cinic_s2_kdft**. Trọng số int8 (riêng conv1: int16),
 | fc | 6 | 8 | – | – | [4, 2048] | [-48, 80] |
 
 ## Đánh giá chi tiết (float) – E2_lite+cinic60_kdft
+
+> ✅ **Chạy thật trên máy nhóm** (`E2_lite+cinic60_kdft`).
 
 Kiến trúc **E2_lite+cinic60_kdft**, accuracy test **90.00%**.
 
@@ -578,6 +645,8 @@ Hình: `figures/confusion_E2_lite+cinic60_kdft.png`, `figures/errors_E2_lite+cin
 
 ## Đánh giá chi tiết (float) – E3d_deep5+cinic60_kdft
 
+> ✅ **Chạy thật trên máy nhóm** (`E3d_deep5+cinic60_kdft`).
+
 Kiến trúc **E3d_deep5+cinic60_kdft**, accuracy test **90.20%**.
 
 | Lớp | Accuracy |
@@ -601,6 +670,8 @@ Nhầm nhiều nhất: **cat → dog** (111 ảnh).
 Hình: `figures/confusion_E3d_deep5+cinic60_kdft.png`, `figures/errors_E3d_deep5+cinic60_kdft.png`.
 
 ## Lượng tử hoá (int8) – E3d_deep5+cinic60_kdft
+
+> ✅ **Chạy thật trên máy nhóm** (`E3d_deep5+cinic60_kdft`).
 
 Kiến trúc **E3d_deep5+cinic60_kdft**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 

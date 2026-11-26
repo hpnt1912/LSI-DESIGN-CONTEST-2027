@@ -1,7 +1,8 @@
 # So sánh mô hình – nên dùng bản nào?
 
-> Bảng đầy đủ mọi thí nghiệm (số do AI chạy trên máy cloud). Nhóm đã chốt 5 mô hình chính –
-> xem bảng kiểm chứng tự cập nhật [`so_sanh_5_mo_hinh.md`](so_sanh_5_mo_hinh.md) và [`KIEM_CHUNG.md`](KIEM_CHUNG.md).
+> ⚠️ **Tài liệu tham khảo: mọi số trong file này do AI chạy trên máy cloud (nhánh `exp/opt-acc-90`), chưa phải
+> số chạy thật trên máy nhóm.** Nhóm đã chốt 5 mô hình chính và chạy thật trên laptop – **số chính thức** nằm ở
+> [`so_sanh_5_mo_hinh.md`](so_sanh_5_mo_hinh.md) (tự cập nhật). Cách kiểm chứng: [`KIEM_CHUNG.md`](KIEM_CHUNG.md).
 
 Nhánh `exp/opt-acc-90`. Mọi con số đo trên **4.000 ảnh test CIFAR-4** (cat/dog/deer/horse), chọn mô hình theo tập
 validation, không theo test. "Số nguyên" = accuracy của `golden_int.py`, tức đúng kết quả phần cứng sẽ cho ra

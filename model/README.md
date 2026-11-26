@@ -34,6 +34,9 @@ Hướng dẫn: [`docs/KIEM_CHUNG.md`](../docs/KIEM_CHUNG.md). Bảng so sánh t
 
 ## Thí nghiệm tối ưu độ chính xác (nhánh `exp/opt-acc-90`)
 
+> ⚠️ Các con số trong mục này do AI chạy trên máy cloud. Số chạy thật trên máy nhóm của 5 mô hình chính:
+> [`docs/so_sanh_5_mo_hinh.md`](../docs/so_sanh_5_mo_hinh.md).
+
 Kiến trúc mới nằm trong `net.OPT_ARCHS`, tách khỏi 4 kiến trúc gốc (`--arch all` vẫn chỉ chạy A–D).
 Công thức huấn luyện mới chỉ bật khi có cờ `--recipe opt`; không có cờ thì mọi thứ chạy như cũ.
 

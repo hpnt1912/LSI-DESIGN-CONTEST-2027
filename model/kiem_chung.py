@@ -76,7 +76,7 @@ MODELS = {
         + stages_after_train("E_opt_cnn+cinic_ft", 16),
         ai_ref=dict(float=90.65, int=90.60, phut=74.7), du_kien="khoảng 1,5 giờ"),
     "E2": dict(
-        run="E2_lite+cinic60_kdft", vai_tro="Cân bằng ★ (khuyên dùng)", conv1_bits=16, cinic=True,
+        run="E2_lite+cinic60_kdft", vai_tro="Cân bằng", conv1_bits=16, cinic=True,
         needs_teacher=True,
         train_runs=["E2_lite+cinic60", "E2_lite+cinic60_kdft"],
         stages=[["train.py", "--arch", "E2_lite+cinic60", *EXTRA, "--epochs", "60"],
@@ -107,7 +107,9 @@ def save_log(log):
 
 
 def now():
-    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    """Giờ Việt Nam (WSL mặc định chạy giờ UTC nên phải chỉ rõ múi giờ)."""
+    from zoneinfo import ZoneInfo
+    return datetime.datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%d %H:%M")
 
 
 def machine():
@@ -258,8 +260,85 @@ def build_table(log, quick=False):
             ok = ref is not None and abs(g["int"] - ref) < 0.01
             log.setdefault(k, {})["nhanh"] = dict(ngay=now(), may=machine(), int=round(g["int"], 2), khop=ok)
     write_doc(info, log)
+    write_results_summary(info, log)
     draw_figure(info)
     return info
+
+
+SUMMARY_HEAD = "## 5 mô hình chính (đang dùng)"
+
+
+def write_results_summary(info, log):
+    """Ghi/thay mục tóm tắt 5 mô hình chính ở ĐẦU model/results.md (ngay dưới tiêu đề)."""
+    rows = []
+    for k in ORDER:
+        m, I = MODELS[k], info[k]
+        g = I["g"]
+        rows.append(f"| **{k}** | {m['vai_tro']} | `{m['run']}` | "
+                    f"{fmt(I['float']) + '%' if I['float'] else '–'} | "
+                    f"**{fmt(g['int']) + '%' if g else '–'}** | {fmt(I['hw']['macs'] / 1e6, 1)} triệu | "
+                    f"{fmt(I['hw']['w_kb'], 1)} KB | {status_text(k, log)} |")
+    body = (f"{SUMMARY_HEAD}\n\n"
+            "> Mục này **tự sinh** bởi `python model/kiem_chung.py` (cập nhật " + now() + "). "
+            "Bảng đầy đủ: [`docs/so_sanh_5_mo_hinh.md`](../docs/so_sanh_5_mo_hinh.md); "
+            "cách kiểm chứng: [`docs/KIEM_CHUNG.md`](../docs/KIEM_CHUNG.md).\n"
+            "> Các bảng và mục bên dưới là nhật ký mọi thí nghiệm (kể cả mô hình không dùng).\n\n"
+            "| Mã | Vai trò | Lượt chạy (tên mục chi tiết bên dưới) | Test float | Test số nguyên (FPGA) | "
+            "MAC/ảnh | Trọng số | Trạng thái |\n|---|---|---|---|---|---|---|---|\n"
+            + "\n".join(rows) + "\n\n")
+    f = config.RESULTS_FILE
+    text = f.read_text()
+    if SUMMARY_HEAD in text:                                  # thay mục cũ
+        a = text.index(SUMMARY_HEAD)
+        b = text.find("\n## ", a + len(SUMMARY_HEAD))
+        text = text[:a] + body + (text[b + 1:] if b != -1 else "")
+    else:                                                     # chèn ngay sau dòng tiêu đề "# ..."
+        first, rest = text.split("\n", 1)
+        text = first + "\n\n" + body + rest.lstrip("\n")
+    f.write_text(label_sections(text, log))
+
+
+# Các lượt nhóm đã chạy tay trên laptop theo file hướng dẫn (24/11/2026), không qua kiem_chung.py
+LAPTOP_MANUAL = {"A_8_16_32", "B_16_32_64", "C_32_64_128", "D_16_32_64_noBN"}
+TAG_OK, TAG_AI = "> ✅ **Chạy thật trên máy nhóm**", "> ⚠️ **Số do AI chạy trên máy cloud**"
+
+
+def laptop_runs(log, final_only=False):
+    """Các lượt chạy thật trên máy nhóm. final_only=True: chỉ lượt cuối (đã đánh giá + lượng tử hoá trên máy
+    nhóm); lượt trung gian (vd. E_opt_cnn+cinic) chỉ được huấn luyện lại, mục lượng tử hoá của nó vẫn là số AI."""
+    runs = set(LAPTOP_MANUAL)
+    for k, m in MODELS.items():
+        if log.get(k, {}).get("trang_thai") == "laptop":
+            runs.update([m["run"]] if final_only else m["train_runs"] + [m["run"]])
+    return runs
+
+
+def label_sections(text, log):
+    """Gắn nhãn nguồn số liệu ngay dưới mỗi mục '## ...' của results.md (xoá nhãn cũ rồi ghi lại)."""
+    ok, ok_final = laptop_runs(log), laptop_runs(log, final_only=True)
+    lines, out, i = text.split("\n"), [], 0
+    while i < len(lines):
+        ln = lines[i]
+        out.append(ln)
+        i += 1
+        if not ln.startswith("## ") or ln.startswith(SUMMARY_HEAD):
+            continue
+        while i + 1 < len(lines) and lines[i] == "" and lines[i + 1].startswith((TAG_OK, TAG_AI)):
+            i += 2                                            # bỏ nhãn cũ
+        title = ln[3:]
+        if title.startswith("So sánh kiến trúc"):
+            rows = [r for r in results_rows()]
+            mine = [r for r in rows if r in ok]
+            others = [r for r in rows if r not in ok]
+            tag = (f"{TAG_OK}: {', '.join(f'`{r}`' for r in mine)}.\n\n"
+                   f"{TAG_AI} – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo: "
+                   f"{', '.join(f'`{r}`' for r in others)}.")
+        else:
+            run = title.split(" – ", 1)[1].strip() if " – " in title else config.CHOSEN_ARCH
+            tag = (f"{TAG_OK} (`{run}`)." if run in ok_final else
+                   f"{TAG_AI} (`{run}`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.")
+        out += ["", tag]
+    return "\n".join(out)
 
 
 def write_doc(info, log):
@@ -314,7 +393,7 @@ def write_doc(info, log):
     doc = f"""# So sánh 5 mô hình chính – LSI Design Contest 2027
 
 > File này **tự sinh** bởi `python model/kiem_chung.py` – không sửa tay (sửa sẽ bị ghi đè).
-> Cập nhật lần cuối: {now()} trên máy `{machine()}`.
+> Cập nhật lần cuối: {now()}. Số liệu từng mô hình lấy từ máy ghi ở dòng **Trạng thái**.
 
 Mọi accuracy đo trên **4.000 ảnh test CIFAR-4**. "Test số nguyên" = kết quả của `golden_int.py`, tức đúng kết
 quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`](KIEM_CHUNG.md).
@@ -329,6 +408,10 @@ BRAM: chip có 1.620 Kb ≈ 202 KB; ước lượng = trọng số + bản đồ
 BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn. Trên ~80% là chật.
 
 ![So sánh độ chính xác và số phép tính](../model/figures/so_sanh_5_mo_hinh.png)
+
+## Nhận xét từ kết quả hiện tại (tự động)
+
+{findings(info)}
 
 ## Ý nghĩa trạng thái
 
@@ -348,17 +431,22 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 - **B3c – Nhanh:** thân B + 1 conv 64→128 ở 4×4. Ít phép tính nhất trong nhóm >85%. Cần CINIC.
 - **E – Chính xác cao:** VGG rút gọn, cặp conv kép ở 16×16. Chậm nhất; **cũng là mạng thầy** (distillation) cho
   E2 và E3d, nên phải chạy E trước.
-- **E2 – Cân bằng ★:** như E nhưng cặp conv kép ở 8×8 → cùng tham số, ít hơn 36% phép tính. Khuyên dùng.
-  Lưu ý: 5 lần huấn luyện trước đây cho 89,45–90,30% (≈90%, chưa chắc lần nào cũng >90%).
-- **E3d – Thử nghiệm:** 5 conv hẹp hơn (24/48/64/64/112), ít phép tính hơn E2. Nếu đạt ~90% thì nhanh hơn E2;
-  đổi lại RTL thêm 1 tầng.
+- **E2 – Cân bằng:** như E nhưng cặp conv kép ở 8×8 → cùng tham số, ít hơn 36% phép tính.
+  Trước khi kiểm chứng, 5 lần AI huấn luyện cho 89,45–90,30% (dao động giữa các lần chạy khá lớn).
+- **E3d – Thử nghiệm mới:** 5 conv hẹp hơn (24/48/64/64/112), ít phép tính nhất trong nhóm ~90%; đổi lại RTL
+  thêm 1 tầng. Lần đầu được huấn luyện chính là lần kiểm chứng trên máy nhóm (không có số AI để so).
 - Các bản `+cinic` học thêm 84.000 ảnh ImageNet 32×32 (CINIC-10), đã loại ảnh gốc CIFAR và ảnh trùng tập test;
   sau đó tinh chỉnh 15 epoch chỉ trên CIFAR. Conv1 dùng trọng số int16 (int16 × uint8 vẫn vừa 1 DSP48E1).
 - Lệnh huấn luyện các bản `+cinic` được dựng lại từ ghi chú commit của nhánh exp (`--cifar-repeat 2`,
   tinh chỉnh `--lr 0.005 --warmup 0`, distillation alpha 0,7 / T 4). Kết quả trên máy nhóm có thể lệch
   vài phần mười % so với số AI.
 
-## Hai kiến trúc mới không chọn (chưa chạy – chỉ là đánh giá trên giấy)
+## Các mô hình khác
+
+Mọi mô hình **ngoài 5 mô hình trên** trong `model/results.md` và `docs/so_sanh_mo_hinh.md` là **số do AI chạy trên
+máy cloud**, chưa huấn luyện lại trên máy nhóm – chỉ để tham khảo (trừ A, C, D: nhóm đã chạy tay ngày 24/11/2026).
+
+### Hai kiến trúc mới không chọn (chưa từng chạy – chỉ là đánh giá trên giấy)
 
 | Kiến trúc | Trọng số / MAC | Đánh giá |
 |---|---|---|
@@ -367,6 +455,31 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 """
     DOC_FILE.write_text(doc)
     print(f"✓ Đã cập nhật {DOC_FILE.relative_to(REPO)}")
+
+
+def findings(info):
+    done = [k for k in ORDER if info[k]["g"]]
+    if not done:
+        return "Chưa có kết quả số nguyên."
+    acc = {k: info[k]["g"]["int"] for k in done}
+    mac = {k: info[k]["hw"]["macs"] / 1e6 for k in done}
+    best = max(done, key=acc.get)
+    near = [k for k in done if acc[k] >= acc[best] - 0.5]
+    lean = min(near, key=mac.get)
+    fast = min((k for k in done if acc[k] >= 85), key=mac.get, default=None)
+    out = [f"- **Chính xác nhất:** {best} – {fmt(acc[best])}% ({fmt(mac[best], 1)} triệu MAC/ảnh).",
+           f"- **Gần bằng mức cao nhất (kém ≤ 0,5 điểm) mà ít phép tính nhất:** {lean} – {fmt(acc[lean])}% "
+           f"với {fmt(mac[lean], 1)} triệu MAC/ảnh"
+           + (f" (ít hơn {best} {fmt((1 - mac[lean] / mac[best]) * 100, 0)}%)." if lean != best else ".")]
+    if fast:
+        out.append(f"- **Nhanh nhất trong nhóm ≥ 85%:** {fast} – {fmt(acc[fast])}% với {fmt(mac[fast], 1)} triệu MAC/ảnh.")
+    diffs = [f"{k} {'+' if acc[k] - MODELS[k]['ai_ref']['int'] >= 0 else ''}"
+             f"{fmt(acc[k] - MODELS[k]['ai_ref']['int'])}" for k in done if MODELS[k]["ai_ref"]]
+    out.append("- **Chênh với số đã ghi trước khi kiểm chứng (điểm %):** " + ", ".join(diffs)
+               + ". Chênh vài phần mười là dao động bình thường giữa hai máy.")
+    out.append("- Mỗi mô hình mới chạy **1 lần** (1 seed); chênh nhau dưới ~0,5 điểm chưa đủ để kết luận "
+               "mô hình nào chắc chắn tốt hơn.")
+    return "\n".join(out)
 
 
 def draw_figure(info):

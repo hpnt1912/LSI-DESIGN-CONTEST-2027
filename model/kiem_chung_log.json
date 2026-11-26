@@ -1,12 +1,12 @@
 {
   "B": {
     "trang_thai": "laptop",
-    "ngay": "2026-11-25 13:34",
+    "ngay": "2026-11-25 20:34",
     "may": "LAPTOP-2RM30BH4",
     "buoc_xong": [],
     "ghi_chu": "Chạy bằng kiem_chung.py",
     "nhanh": {
-      "ngay": "2026-11-25 13:13",
+      "ngay": "2026-11-25 20:13",
       "may": "LAPTOP-2RM30BH4",
       "int": 80.0,
       "khop": true
@@ -14,47 +14,47 @@
   },
   "B3c": {
     "nhanh": {
-      "ngay": "2026-11-25 13:13",
+      "ngay": "2026-11-25 20:13",
       "may": "LAPTOP-2RM30BH4",
       "int": 87.2,
       "khop": true
     },
     "buoc_xong": [],
     "trang_thai": "laptop",
-    "ngay": "2026-11-25 14:06",
+    "ngay": "2026-11-25 21:06",
     "may": "LAPTOP-2RM30BH4",
     "ghi_chu": "Chạy bằng kiem_chung.py"
   },
   "E": {
     "nhanh": {
-      "ngay": "2026-11-25 13:14",
+      "ngay": "2026-11-25 20:14",
       "may": "LAPTOP-2RM30BH4",
       "int": 90.6,
       "khop": true
     },
     "buoc_xong": [],
     "trang_thai": "laptop",
-    "ngay": "2026-11-25 15:20",
+    "ngay": "2026-11-25 22:20",
     "may": "LAPTOP-2RM30BH4",
     "ghi_chu": "Chạy bằng kiem_chung.py"
   },
   "E2": {
     "nhanh": {
-      "ngay": "2026-11-25 13:14",
+      "ngay": "2026-11-25 20:14",
       "may": "LAPTOP-2RM30BH4",
       "int": 90.3,
       "khop": true
     },
     "buoc_xong": [],
     "trang_thai": "laptop",
-    "ngay": "2026-11-25 16:59",
+    "ngay": "2026-11-25 23:59",
     "may": "LAPTOP-2RM30BH4",
     "ghi_chu": "Chạy bằng kiem_chung.py"
   },
   "E3d": {
     "buoc_xong": [],
     "trang_thai": "laptop",
-    "ngay": "2026-11-25 18:38",
+    "ngay": "2026-11-26 01:38",
     "may": "LAPTOP-2RM30BH4",
     "ghi_chu": "Chạy bằng kiem_chung.py"
   }

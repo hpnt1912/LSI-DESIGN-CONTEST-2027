@@ -24,10 +24,21 @@
 - Chỉ dùng các phép: Conv 3×3, ReLU, MaxPool 2×2, Fully connected (theo tài liệu lần 23)
 - Lượng tử hóa: trọng số int8, activation uint8 (sau ReLU), bias/tổng tích luỹ int32, thang lũy thừa của 2 theo từng tầng
 
-## Kết quả (23/11/2026, xem `model/results.md`)
-- Mô hình chọn: B_16_32_64 – 27.684 tham số, 2,8 triệu MAC/ảnh, 27 KB int8
-- Accuracy test: 79,67% (float), 79,83% (số nguyên int8); golden model trùng từng bit với cách tính thứ hai
-- Hướng dẫn chi tiết: `docs/HuongDan_MoHinh_CNN_Python.docx`
+## Kết quả đã kiểm chứng trên laptop của nhóm (25–26/11/2026)
+
+Test 4.000 ảnh CIFAR-4; "số nguyên" = kết quả golden model = kết quả FPGA. Chi tiết: `docs/so_sanh_5_mo_hinh.md`.
+
+| Mô hình | Vai trò | Float | Số nguyên | MAC/ảnh | Trọng số | Dữ liệu |
+|---|---|---|---|---|---|---|
+| B_16_32_64 | Cơ bản | 80,23% | 80,00% | 2,8 triệu | 27 KB | CIFAR |
+| B3c_c4x4_128+cinic_ft | Nhanh | 87,67% | 87,60% | 4,0 triệu | 104 KB | CIFAR + CINIC-10 |
+| E_opt_cnn+cinic_ft | Chính xác cao | 90,45% | 90,65% | 19,8 triệu | 137 KB | CIFAR + CINIC-10 |
+| E2_lite+cinic60_kdft | Cân bằng | 90,00% | 89,60% | 12,7 triệu | 137 KB | CIFAR + CINIC-10 |
+| E3d_deep5+cinic60_kdft | Thử nghiệm mới | 90,20% | 90,25% | 11,6 triệu | 146 KB | CIFAR + CINIC-10 |
+
+- Golden model của cả 5 mô hình trùng từng bit với cách tính thứ hai bằng PyTorch.
+- Các bản dùng CINIC vượt ngân sách trọng số 100 KB ở trên (BRAM ước lượng 55–79%) – cần kiểm tra khi thiết kế RTL.
+- Hướng dẫn học: `docs/HuongDan_MoHinh_CNN_Python.docx`; cách kiểm chứng lại: `docs/KIEM_CHUNG.md`.
 
 ## Tiêu chí đánh giá
 - Độ chính xác trên tập test và ảnh thật
