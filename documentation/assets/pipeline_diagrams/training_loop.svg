@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="668" viewBox="0 0 900 668" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" role="img">
+<title>Vòng lặp huấn luyện trong train.py (train_one)</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#666666"/></marker></defs>
+<rect x="0" y="0" width="900" height="668" fill="#ffffff"/>
+<text x="450.0" y="30" font-size="17" text-anchor="middle" font-weight="bold" fill="#191919">Vòng lặp huấn luyện – model/train.py, hàm train_one() (dòng 77–164)</text>
+<rect x="120" y="56" width="520" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="77.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">Khởi tạo</text>
+<text x="380.0" y="94.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">set_seed · net.build · (--init) · (thầy) · loss/optimizer/scheduler</text>
+<text x="652" y="85.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 80–108</text>
+<line x1="380.0" y1="106" x2="380.0" y2="120" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="122" width="520" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="143.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">Lấy 1 batch</text>
+<text x="380.0" y="160.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">for x, y in train_loader  (augment ngẫu nhiên mỗi lần lấy)</text>
+<text x="652" y="151.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 119</text>
+<line x1="380.0" y1="172" x2="380.0" y2="186" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="188" width="520" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="209.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">1) Lan truyền xuôi</text>
+<text x="380.0" y="226.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">logits = model(x)    – (thầy: t_logits = teacher(x))</text>
+<text x="652" y="217.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 123, 129</text>
+<line x1="380.0" y1="238" x2="380.0" y2="252" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="254" width="520" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="275.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">2) Tính loss</text>
+<text x="380.0" y="292.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">CrossEntropy(+label smoothing)  · (+ distill_loss)</text>
+<text x="652" y="283.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 124, 130</text>
+<line x1="380.0" y1="304" x2="380.0" y2="318" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="320" width="520" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="341.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">3) Xoá gradient cũ</text>
+<text x="380.0" y="358.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">opt.zero_grad()</text>
+<text x="652" y="349.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 131</text>
+<line x1="380.0" y1="370" x2="380.0" y2="384" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="386" width="520" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="407.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">4) Lan truyền ngược</text>
+<text x="380.0" y="424.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">loss.backward()  → ∂loss/∂w cho mọi trọng số</text>
+<text x="652" y="415.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 132</text>
+<line x1="380.0" y1="436" x2="380.0" y2="450" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="452" width="520" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="473.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">5) Cập nhật trọng số</text>
+<text x="380.0" y="490.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">opt.step()   (AdamW cho B · SGD nesterov cho 4 mô hình còn lại)</text>
+<text x="652" y="481.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 133</text>
+<path d="M120,477.0 L80,477.0 L80,147.0 L118,147.0" fill="none" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="74" y="312.0" font-size="11" text-anchor="end" font-weight="normal" fill="#666666">batch tiếp</text>
+<line x1="380.0" y1="502" x2="380.0" y2="524" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="524" width="520" height="50" rx="6" fill="#fde3d3" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="545.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">Hết 1 epoch</text>
+<text x="380.0" y="562.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">sched.step() · evaluate(model, val) · nếu val tốt nhất → torch.save</text>
+<text x="652" y="553.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 139–151</text>
+<path d="M640,539.0 L750,539.0 L750,135.0 L642,135.0" fill="none" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="756" y="335.5" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">epoch tiếp</text>
+<line x1="380.0" y1="574" x2="380.0" y2="588" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="120" y="590" width="520" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="380.0" y="611.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">Kết thúc</text>
+<text x="380.0" y="628.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">nạp checkpoint tốt nhất → đo test 1 lần → vẽ đường học → ghi results.md</text>
+<text x="652" y="619.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">dòng 155–163</text>
+</svg>

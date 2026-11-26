@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" role="img">
+<title>Từ mô hình float sang số nguyên cho phần cứng</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#666666"/></marker></defs>
+<rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+<text x="450.0" y="30" font-size="16" text-anchor="middle" font-weight="bold" fill="#191919">Từ mô hình float đến file .mem cho RTL – model/quantize.py, golden_int.py, export.py</text>
+<rect x="40" y="52" width="600" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="73.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">checkpoints/&lt;run&gt;.pt</text>
+<text x="340.0" y="90.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">mạng float: Conv(bias=False) → BN → ReLU → [MaxPool] … → Linear</text>
+<line x1="340.0" y1="102" x2="340.0" y2="112" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="114" width="600" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="135.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">1. Gộp BN – fold_bn()</text>
+<text x="340.0" y="152.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">W' = k·W,  b' = k·(b − μ) + β,  k = γ/√(σ²+ε)</text>
+<text x="654" y="143.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">quantize.py 34–65</text>
+<line x1="340.0" y1="164" x2="340.0" y2="174" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="176" width="600" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="197.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">2. Hiệu chuẩn – calib_amax()</text>
+<text x="340.0" y="214.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">2.000 ảnh train → phân vị 99,99% activation sau ReLU mỗi tầng</text>
+<text x="654" y="205.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">quantize.py 84–96</text>
+<line x1="340.0" y1="226" x2="340.0" y2="236" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="238" width="600" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="259.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">3. Chọn thang lũy thừa 2 – frac_bits_for()</text>
+<text x="340.0" y="276.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">f = ⌊log2(q_max / max|v|)⌋  → fw, f_out, shift</text>
+<text x="654" y="267.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">quantize.py 99–130</text>
+<line x1="340.0" y1="288" x2="340.0" y2="298" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="300" width="600" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="321.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">4. Làm tròn</text>
+<text x="340.0" y="338.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">Wq = round(W·2^fw) int8 (conv1 int16) · bq = round(b·2^(f_in+fw)) int32</text>
+<text x="654" y="329.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">quantize.py 113–117</text>
+<line x1="340.0" y1="350" x2="340.0" y2="360" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="362" width="600" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="383.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">5. Golden model số nguyên – golden_int.infer()</text>
+<text x="340.0" y="400.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">acc = ΣWq·xq + bq ; y = clip((acc + 2^(s−1)) &gt;&gt; s, 0, 255)</text>
+<text x="654" y="391.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">golden_int.py 43–84</text>
+<line x1="340.0" y1="412" x2="340.0" y2="422" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="424" width="600" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="445.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">6. So khớp từng bit</text>
+<text x="340.0" y="462.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">torch_int_forward() (cách tính thứ hai) phải ra logit giống hệt</text>
+<text x="654" y="453.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">quantize.py 147–161, 199–207</text>
+<line x1="340.0" y1="474" x2="340.0" y2="484" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="40" y="486" width="600" height="50" rx="6" fill="#fde3d3" stroke="#8c8c8c" stroke-width="1"/>
+<text x="340.0" y="507.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">7. Xuất cho RTL – export.py</text>
+<text x="340.0" y="524.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">weights/*.mem (hex bù 2) · testvec/*.mem · labels.csv · README.md</text>
+<text x="654" y="515.0" font-size="11" text-anchor="start" font-weight="normal" fill="#666666">export.py 43–118</text>
+</svg>

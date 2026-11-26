@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="390" viewBox="0 0 900 390" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" role="img">
+<title>Thứ tự chạy 5 mô hình trong kiem_chung.py</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#666666"/></marker></defs>
+<rect x="0" y="0" width="900" height="390" fill="#ffffff"/>
+<text x="450.0" y="30" font-size="16" text-anchor="middle" font-weight="bold" fill="#191919">kiem_chung.py: các bước của 5 mô hình và phụ thuộc mạng thầy</text>
+<text x="30" y="82" font-size="14" text-anchor="start" font-weight="bold" fill="#191919">B</text>
+<rect x="82" y="60" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="197.0" y="76.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train B_16_32_64</text>
+<text x="197.0" y="93.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">30 epoch · CIFAR</text>
+<line x1="312" y1="80" x2="326" y2="80" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="328" y="60" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="361.0" y="85.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">evaluate</text>
+<rect x="400" y="60" width="74" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="437.0" y="85.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">quantize</text>
+<rect x="480" y="60" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="513.0" y="85.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">golden</text>
+<rect x="552" y="60" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="585.0" y="85.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">export</text>
+<text x="30" y="140" font-size="14" text-anchor="start" font-weight="bold" fill="#191919">B3c</text>
+<rect x="82" y="118" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="197.0" y="134.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train B3c_c4x4_128+cinic</text>
+<text x="197.0" y="151.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">30 epoch · +CINIC</text>
+<line x1="312" y1="138" x2="326" y2="138" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="328" y="118" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="443.0" y="134.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train B3c_c4x4_128+cinic_ft</text>
+<text x="443.0" y="151.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">15 epoch · CIFAR</text>
+<line x1="558" y1="138" x2="572" y2="138" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="574" y="118" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="607.0" y="143.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">evaluate</text>
+<rect x="646" y="118" width="74" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="683.0" y="143.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">quantize</text>
+<rect x="726" y="118" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="759.0" y="143.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">golden</text>
+<rect x="798" y="118" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="831.0" y="143.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">export</text>
+<text x="30" y="198" font-size="14" text-anchor="start" font-weight="bold" fill="#191919">E</text>
+<rect x="82" y="176" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="197.0" y="192.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train E_opt_cnn+cinic</text>
+<text x="197.0" y="209.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">30 epoch · +CINIC</text>
+<line x1="312" y1="196" x2="326" y2="196" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="328" y="176" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="443.0" y="192.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train E_opt_cnn+cinic_ft</text>
+<text x="443.0" y="209.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">15 epoch · CIFAR</text>
+<line x1="558" y1="196" x2="572" y2="196" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="574" y="176" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="607.0" y="201.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">evaluate</text>
+<rect x="646" y="176" width="74" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="683.0" y="201.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">quantize</text>
+<rect x="726" y="176" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="759.0" y="201.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">golden</text>
+<rect x="798" y="176" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="831.0" y="201.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">export</text>
+<text x="30" y="256" font-size="14" text-anchor="start" font-weight="bold" fill="#191919">E2</text>
+<rect x="82" y="234" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="197.0" y="250.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train E2_lite+cinic60</text>
+<text x="197.0" y="267.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">60 epoch · +CINIC</text>
+<line x1="312" y1="254" x2="326" y2="254" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="328" y="234" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="443.0" y="250.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train E2_lite+cinic60_kdft</text>
+<text x="443.0" y="267.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">15 epoch · CIFAR +thầy E</text>
+<line x1="558" y1="254" x2="572" y2="254" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="574" y="234" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="607.0" y="259.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">evaluate</text>
+<rect x="646" y="234" width="74" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="683.0" y="259.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">quantize</text>
+<rect x="726" y="234" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="759.0" y="259.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">golden</text>
+<rect x="798" y="234" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="831.0" y="259.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">export</text>
+<text x="30" y="314" font-size="14" text-anchor="start" font-weight="bold" fill="#191919">E3d</text>
+<rect x="82" y="292" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="197.0" y="308.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train E3d_deep5+cinic60</text>
+<text x="197.0" y="325.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">60 epoch · +CINIC</text>
+<line x1="312" y1="312" x2="326" y2="312" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="328" y="292" width="230" height="40" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="443.0" y="308.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">train E3d_deep5+cinic60_kdft</text>
+<text x="443.0" y="325.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">15 epoch · CIFAR +thầy E</text>
+<line x1="558" y1="312" x2="572" y2="312" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="574" y="292" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="607.0" y="317.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">evaluate</text>
+<rect x="646" y="292" width="74" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="683.0" y="317.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">quantize</text>
+<rect x="726" y="292" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="759.0" y="317.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">golden</text>
+<rect x="798" y="292" width="66" height="40" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="831.0" y="317.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#191919">export</text>
+<text x="30" y="350" font-size="12" text-anchor="start" font-weight="normal" fill="#666666">Mạng thầy: ở lượt tinh chỉnh _kdft, E2 và E3d dùng checkpoint E_opt_cnn+cinic_ft (--teacher).</text>
+<text x="30" y="368" font-size="12" text-anchor="start" font-weight="normal" fill="#666666">Vì vậy kiem_chung.py luôn xếp E chạy trước E2 và E3d (kiem_chung.py dòng 576–580).</text>
+</svg>

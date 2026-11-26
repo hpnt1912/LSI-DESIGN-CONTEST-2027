@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="760" viewBox="0 0 980 760" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" role="img">
+<title>Pipeline toàn dự án: dữ liệu → huấn luyện → số nguyên → RTL</title>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#666666"/></marker></defs>
+<rect x="0" y="0" width="980" height="760" fill="#ffffff"/>
+<text x="490.0" y="30" font-size="18" text-anchor="middle" font-weight="bold" fill="#191919">Pipeline toàn dự án (mỗi hộp ghi file Python thực hiện)</text>
+<rect x="30" y="60" width="250" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="155.0" y="81.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">CIFAR-10 (tải tự động)</text>
+<text x="155.0" y="98.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">torchvision.datasets.CIFAR10</text>
+<rect x="30" y="140" width="250" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="155.0" y="161.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">prepare_cifar4.py</text>
+<text x="155.0" y="178.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">giữ 4 lớp cat/dog/deer/horse</text>
+<rect x="30" y="220" width="250" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="155.0" y="241.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">data/cifar4.npz</text>
+<text x="155.0" y="258.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">20.000 train · 4.000 test</text>
+<rect x="700" y="60" width="250" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="825.0" y="81.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">CINIC-10.tar.gz (687 MB)</text>
+<text x="825.0" y="98.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">tải tay – Đại học Edinburgh</text>
+<rect x="700" y="140" width="250" height="50" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="825.0" y="161.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">prepare_cinic4.py</text>
+<text x="825.0" y="178.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">chỉ lấy ảnh ImageNet, bỏ ảnh CIFAR</text>
+<rect x="700" y="220" width="250" height="50" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="825.0" y="241.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">data/cinic4_extra.npz</text>
+<text x="825.0" y="258.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">84.000 ảnh (B3c, E, E2, E3d)</text>
+<line x1="155" y1="110" x2="155" y2="138" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="155" y1="190" x2="155" y2="218" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="825" y1="110" x2="825" y2="138" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="825" y1="190" x2="825" y2="218" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="330" y="300" width="320" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="490.0" y="324.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">data.py – get_loaders()</text>
+<text x="490.0" y="341.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">tách 18.000 train / 2.000 val · augment · batch</text>
+<path d="M155,270 L155,328 L328,328" fill="none" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M825,270 L825,328 L652,328" fill="none" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)" stroke-dasharray="5 4"/>
+<text x="815" y="300" font-size="11" text-anchor="end" font-weight="normal" fill="#666666">--extra-data (4 mô hình +cinic)</text>
+<rect x="30" y="400" width="250" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="155.0" y="424.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">net.py – build(run)</text>
+<text x="155.0" y="441.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">SmallCNN (B) / VGGLite (4 mô hình)</text>
+<rect x="330" y="400" width="320" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="490.0" y="424.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">train.py – train_one()</text>
+<text x="490.0" y="441.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">forward → loss → backward → SGD/AdamW</text>
+<line x1="490" y1="356" x2="490" y2="398" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="280" y1="428" x2="328" y2="428" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="700" y="400" width="250" height="56" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="825.0" y="424.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">checkpoints/&lt;run&gt;.pt</text>
+<text x="825.0" y="441.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">trọng số float tốt nhất theo val</text>
+<line x1="650" y1="428" x2="698" y2="428" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="490" y="474" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">B3c/E/E2/E3d: 2 lượt train (+cinic → tinh chỉnh _ft/_kdft)</text>
+<rect x="700" y="500" width="250" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="825.0" y="524.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">evaluate.py</text>
+<text x="825.0" y="541.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">accuracy, ma trận nhầm lẫn, hình</text>
+<rect x="330" y="500" width="320" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="490.0" y="524.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">quantize.py</text>
+<text x="490.0" y="541.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">gộp BN · hiệu chuẩn · int8/int16, shift</text>
+<line x1="825" y1="456" x2="825" y2="498" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M760,456 L760,488 L490,488 L490,498" fill="none" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="30" y="500" width="250" height="56" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="155.0" y="524.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">export_&lt;run&gt;/qparams.npz/.json</text>
+<text x="155.0" y="541.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">tham số số nguyên</text>
+<line x1="330" y1="528" x2="282" y2="528" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="30" y="600" width="250" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="155.0" y="624.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">golden_int.py</text>
+<text x="155.0" y="641.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">suy luận chỉ bằng số nguyên</text>
+<rect x="330" y="600" width="320" height="56" rx="6" fill="#cce3fd" stroke="#8c8c8c" stroke-width="1"/>
+<text x="490.0" y="624.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">export.py</text>
+<text x="490.0" y="641.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">weights/*.mem · testvec/*.mem · README</text>
+<rect x="700" y="600" width="250" height="56" rx="6" fill="#efefef" stroke="#8c8c8c" stroke-width="1"/>
+<text x="825.0" y="624.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">RTL Verilog (rtl/, tb/)</text>
+<text x="825.0" y="641.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">chưa có trong repo – bước sau</text>
+<line x1="155" y1="556" x2="155" y2="598" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="280" y1="628" x2="328" y2="628" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="650" y1="628" x2="698" y2="628" stroke="#666666" stroke-width="1.6" marker-end="url(#ah)" stroke-dasharray="5 4"/>
+<rect x="30" y="690" width="920" height="50" rx="6" fill="#fde3d3" stroke="#8c8c8c" stroke-width="1"/>
+<text x="490.0" y="711.0" font-size="13" text-anchor="middle" font-weight="bold" fill="#191919">results.md · figures/*.png · docs/so_sanh_5_mo_hinh.md · kiem_chung_log.json</text>
+<text x="490.0" y="728.0" font-size="11" text-anchor="middle" font-weight="normal" fill="#666666">kiem_chung.py gọi lần lượt train → evaluate → quantize → golden → export cho 5 mô hình và tự cập nhật các file này</text>
+</svg>
