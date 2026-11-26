@@ -79,6 +79,16 @@ python documentation/tools/make_figures.py
 Lệnh trên vẽ lại mọi sơ đồ SVG từ code, từ `qparams.json` và từ `docs/so_sanh_5_mo_hinh.md`, rồi chép hình của dự án vào
 `assets/project_figures/`.
 
+```bash
+python documentation/tools/check_cinic_leak.py
+```
+Lệnh trên đo ảnh gần trùng giữa 84.000 ảnh CINIC và 4.000 ảnh test, rồi tính accuracy của 5 mô hình trên phần test "sạch" (khoảng 3 phút,
+cần `data/*.npz`). Kết quả lần chạy 26/11: khoảng 5–8% ảnh test có bản gần trùng, nhưng không làm phồng kết quả (chi tiết ở
+[15_CODE_REVIEW_NOTES.md](15_CODE_REVIEW_NOTES.md) mục B5).
+
+Hai script mới trong `model/` (thêm 26/11, hướng dẫn ở `docs/KIEM_CHUNG.md` Bước 4–5): `python model/anh_that.py` (đo 5 mô hình trên ảnh
+thật) và `python model/nhieu_seed.py <mã>` (chạy thêm seed).
+
 ## Quy ước trong tài liệu
 
 - Số viết theo kiểu Việt Nam: `138.372` (dấu chấm ngăn nghìn), `90,65%` (dấu phẩy thập phân). Trong code và lệnh thì giữ nguyên kiểu

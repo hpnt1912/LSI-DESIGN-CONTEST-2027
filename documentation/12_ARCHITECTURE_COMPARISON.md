@@ -131,7 +131,7 @@ Dữ liệu thực nghiệm có thể dùng:
 - Không mô hình nào có dấu hiệu overfitting rõ trên đường học (val không giảm khi train tăng).
 - Độ chênh giữa val và test của cả 5 đều nhỏ hơn sai số đo (val ±0,67, test ±0,47 điểm ở mức 90%).
 - **E** bền nhất khi chuyển sang số nguyên (99,0% trùng, số nguyên còn tăng). **E2** kém bền nhất (−0,40).
-- **Tổng quát hoá ra ảnh camera ngày thi chưa được đo** (repo chưa có `model/real_images/`), nên **chưa xác định được** mô hình nào tốt hơn
+- **Tổng quát hoá ra ảnh camera ngày thi chưa được đo** (repo chưa có `model/real_images/`; đo bằng `python model/anh_that.py`), nên **chưa xác định được** mô hình nào tốt hơn
   trên ảnh thật. Có thể *dự đoán* các mô hình học thêm ảnh ImageNet (CINIC) sẽ bền hơn B với ảnh "khác CIFAR", nhưng đây chỉ là giả thuyết
   chưa kiểm chứng.
 

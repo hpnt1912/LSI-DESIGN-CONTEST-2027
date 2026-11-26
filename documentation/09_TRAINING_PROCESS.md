@@ -71,7 +71,8 @@ torch.use_deterministic_algorithms(True, warn_only=True)
 ```
 
 Lệnh này cố định khởi tạo trọng số và chuỗi tăng cường ngẫu nhiên (NumPy). Thứ tự xáo trộn batch được cố định riêng bằng generator ở
-`data.py` dòng 103.
+`data.py` dòng 103, cũng theo `--seed` (mặc định 2027). Trước bản sửa ngày 26/11, generator luôn dùng 2027 bất kể `--seed`
+(xem [15_CODE_REVIEW_NOTES.md](15_CODE_REVIEW_NOTES.md) mục B1).
 
 ### Bước 1 – Khởi tạo mô hình (dòng 81–84)
 

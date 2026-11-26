@@ -427,15 +427,45 @@ python model/kiem_chung.py tatca
 
 Tuỳ chọn `--thu` chạy mọi bước với 1 epoch để kiểm tra script (không commit). Hướng dẫn cho người dùng cuối: `docs/KIEM_CHUNG.md`.
 
-## Bước thêm (tuỳ chọn) – Dự đoán ảnh thật
+## Bước thêm 1 (tuỳ chọn) – Đo trên ảnh thật
+
+Đặt ảnh vào `model/real_images/cat/`, `dog/`, `deer/`, `horse/` (kích thước bất kỳ), rồi chạy:
+
+```bash
+python model/anh_that.py
+```
+
+| Mục | Nội dung |
+|---|---|
+| Làm gì | Chạy golden model số nguyên của cả 5 mô hình (thêm float nếu máy có checkpoint) trên ảnh thật; so với test CIFAR |
+| File | `model/anh_that.py` (dùng `load_32x32` của `predict_image.py`: cắt giữa thành hình vuông, thu về 32×32) |
+| Đầu ra | Bảng accuracy ± khoảng tin cậy 95%, từng lớp, chênh so với CIFAR, danh sách ảnh cả 5 mô hình đều sai |
+| Lưu ở đâu | Mục "Ảnh thật (model/real_images)" trong `model/results.md` |
+
+Muốn xem dự đoán từng ảnh của một mô hình thì dùng `predict_image.py`:
 
 ```bash
 python model/predict_image.py model/real_images --arch "E2_lite+cinic60_kdft"
 ```
 
-`predict_image.py` cắt giữa ảnh thành hình vuông, thu về 32×32 (dòng 27–32), rồi in dự đoán của cả mô hình float và golden model số
-nguyên. Nếu ảnh nằm trong thư mục con `cat/`, `dog/`, `deer/`, `horse/` thì script tính luôn accuracy. Hiện repo **chưa có**
-`model/real_images/`, nên accuracy trên ảnh thật **chưa xác định được**.
+Hiện repo **chưa có** ảnh thật nên accuracy trên ảnh thật **chưa xác định được**. Hướng dẫn chụp và chuẩn bị ảnh: `docs/KIEM_CHUNG.md`
+Bước 4.
+
+## Bước thêm 2 (tuỳ chọn) – Chạy thêm seed
+
+```bash
+python model/nhieu_seed.py E3d
+```
+
+| Mục | Nội dung |
+|---|---|
+| Làm gì | Huấn luyện lại mô hình đã chọn với seed 2 và 3, đúng công thức của lượt chính, rồi lượng tử hoá + golden |
+| File | `model/nhieu_seed.py` (lấy lệnh từ `kiem_chung.MODELS`, thêm `--seed`, đổi tên lượt chạy thành `..._s2`, `..._s3`) |
+| Đầu vào | dữ liệu CIFAR + CINIC; với E2/E3d cần checkpoint mạng thầy `E_opt_cnn+cinic_ft.pt` |
+| Đầu ra | Mục "Nhiều seed – <mã>" trong `model/results.md`: từng seed và trung bình ± độ lệch chuẩn |
+| Lưu ở đâu | `model/results.md`, `model/export_<lượt chạy>_s<seed>/`, checkpoint trong `model/checkpoints/` |
+
+Script không tự push; hướng dẫn đầy đủ: `docs/KIEM_CHUNG.md` Bước 5.
 
 ---
 

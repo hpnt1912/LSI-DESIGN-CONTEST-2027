@@ -153,6 +153,11 @@ Vì mỗi lớp có đúng 1.000 ảnh test (dữ liệu cân bằng), macro-F1 
 - Mỗi mô hình mới được huấn luyện **1 lần** (1 seed). Trên máy cloud, 5 lần huấn luyện E2 (khác seed / số epoch / có-không KD) cho
   89,45–90,30% số nguyên (`model/results.md`, các lượt `E2_lite+cinic*`). Đây là ví dụ thực tế cho độ dao động giữa các lần chạy.
 - Lượt chạy trên laptop lệch số cloud vài phần mười %: B3c +0,40, E +0,05, E2 −0,70 điểm (`docs/so_sanh_5_mo_hinh.md`).
+- Muốn có "trung bình ± độ lệch chuẩn" thay cho số của một lần chạy: `python model/nhieu_seed.py <mã>` (`docs/KIEM_CHUNG.md` Bước 5).
+- **Ảnh gần trùng giữa CINIC và tập test.** Khoảng 5–8% ảnh test có bản gần trùng trong CINIC. Đo lại trên phần test "sạch" (bỏ 569 ảnh
+  có ảnh CINIC tương quan ≥ 0,80), số nguyên còn: B 79,19 · B3c 87,12 · E 90,18 · E2 89,19 · E3d 89,80. Mọi mô hình giảm 0,4–0,8 điểm,
+  và **B (không học CINIC) giảm nhiều nhất**, nên đó là do nhóm ảnh trùng vốn dễ, không phải do rò rỉ. Thứ tự các mô hình không đổi
+  ([15_CODE_REVIEW_NOTES.md](15_CODE_REVIEW_NOTES.md) mục B5).
 
 ---
 

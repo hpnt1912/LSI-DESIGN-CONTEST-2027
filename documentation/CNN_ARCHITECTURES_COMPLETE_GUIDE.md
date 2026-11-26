@@ -555,7 +555,7 @@ Chi tiết: [10_QUANTIZATION_AND_HARDWARE.md](10_QUANTIZATION_AND_HARDWARE.md).
 5. **Kết quả tốt nhất:** E (90,65%). Tuy vậy E, E3d, E2 nằm trong sai số đo và chỉ chạy 1 seed. Về hiệu quả: E3d (~90% với 11,6 triệu
    MAC); trong nhóm ≥ 85% thì B3c tốt nhất.
 6. **Tổng quát hoá:** cả 5 có |test − val| nhỏ hơn sai số đo, không thấy overfitting rõ. E bền nhất khi lượng tử. Trên ảnh camera thật thì
-   **chưa xác định được** (chưa có `real_images`).
+   **chưa xác định được** (chưa có `real_images`; đo bằng `python model/anh_that.py`).
 7. **Đánh đổi:** lợi ích giảm dần. B → B3c: +7,6 điểm với +42% MAC. B3c → E3d: +2,65 điểm với ×2,9 MAC. E3d → E: +0,40 điểm với ×1,7 MAC.
 8. **Khi nào dùng:**
    - B: bản RTL đầu tiên;
@@ -638,26 +638,28 @@ Lời giải và lệnh kiểm tra: [14_LEARNING_ROADMAP.md](14_LEARNING_ROADMAP
 
 ## 12. Điểm bất thường trong code
 
-Không có lỗi nào làm sai accuracy của 5 mô hình. Những điểm cần biết:
+Không có lỗi nào làm sai accuracy của 5 mô hình. Ngày 26/11, các mục ✅ đã được sửa trong code; với seed mặc định, code mới huấn
+luyện ra trọng số giống hệt từng bit code cũ.
 
 - 🔴 **Giới hạn của thí nghiệm:**
-  - mỗi mô hình chỉ chạy 1 seed;
-  - chưa đo trên ảnh thật;
+  - mỗi mô hình chỉ chạy 1 seed (công cụ: `model/nhieu_seed.py`);
+  - chưa đo trên ảnh thật (công cụ: `model/anh_that.py`);
   - chưa có RTL, nên tài nguyên mới là ước lượng;
   - E, E2, E3d vượt ngân sách 100 KB;
   - ở 20 MHz, nhóm ~90% chưa đạt 30 khung/giây;
   - báo cáo phải nêu việc dùng CINIC.
 - 🟠 **Lỗi tiềm ẩn:**
-  - `--seed` không đổi thứ tự xáo dữ liệu (`data.py:103`);
-  - tăng cường dùng `np.random` toàn cục, nên sẽ trùng giữa các worker nếu `num_workers > 0`;
-  - `lr or OPT_LR` (`train.py:180`);
-  - `kiem_chung.py` mặc định push;
-  - chống trùng CINIC chỉ bắt ảnh trùng tuyệt đối.
+  - ✅ `--seed` không đổi thứ tự xáo dữ liệu (`data.py:103`), nay đã theo `--seed`;
+  - ✅ tăng cường dùng `np.random` toàn cục, nay đã có `seed_worker` cho trường hợp `num_workers > 0`;
+  - ✅ `lr or OPT_LR` (`train.py:180`);
+  - `kiem_chung.py` mặc định push (cố ý; khi thử thì thêm `--khong-push`);
+  - ✅ đã đo ảnh gần trùng CINIC ↔ test: khoảng 5–8% ảnh test có bản gần trùng, nhưng **không làm phồng** kết quả, vì B (không học
+    CINIC) cũng đoán nhóm đó đúng hơn hẳn.
 - 🟡 **Chưa nhất quán:**
-  - tiêu đề "Khoảng W (int8)" dù conv1 là int16 (`quantize.py:222`);
+  - ✅ tiêu đề "Khoảng W (int8)" dù conv1 là int16 (`quantize.py:222`);
   - val loss và train loss không cùng định nghĩa;
   - cột "KB int8" của `results.md` bỏ qua bias int32;
-  - chú thích cũ "nhánh exp/opt-acc-90".
+  - ✅ chú thích cũ "nhánh exp/opt-acc-90".
 
 Đầy đủ (vị trí, ảnh hưởng, cách sửa gợi ý): [15_CODE_REVIEW_NOTES.md](15_CODE_REVIEW_NOTES.md).
 

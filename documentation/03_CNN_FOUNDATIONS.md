@@ -56,7 +56,7 @@ Quy ước: ví dụ ghi "*minh hoạ*" là số tự chọn để giải thích
 5. **Trong code.**
    - `model/data.py` dòng 38: `torch.from_numpy(img_uint8).permute(2, 0, 1)` đổi (32, 32, 3) → (3, 32, 32).
    - `model/golden_int.py` dòng 71: `transpose(0, 3, 1, 2)` đổi NHWC → NCHW.
-   - `model/data.py` dòng 121 in kích thước một batch.
+   - `model/data.py` dòng 128 in kích thước một batch.
 
 ## 2. Biểu diễn ảnh (image representation)
 

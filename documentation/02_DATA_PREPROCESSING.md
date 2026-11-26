@@ -68,9 +68,17 @@ các ảnh đó vào train, mô hình sẽ "thấy trước" ảnh test, và con
 **Kết quả.** Mỗi lớp có 21.000 ảnh ImageNet (7.000 ảnh trong mỗi thư mục train/valid/test của CINIC), tổng **84.000 ảnh**. Lần tạo dữ liệu trên
 máy cloud in ra: "bỏ 24.000 ảnh gốc CIFAR, bỏ 0 ảnh trùng pixel với tập test". Kết quả này tất định: cùng file tar thì ra cùng kết quả.
 
-**Giới hạn của lớp bảo vệ 2.** Nó chỉ bắt ảnh **giống hệt từng pixel**. Ảnh gần giống (cùng con vật nhưng bị nén hay thu nhỏ khác đi) thì
-**chưa kiểm tra được**. Rủi ro này nhỏ, vì CIFAR lấy ảnh từ bộ "80 Million Tiny Images" còn phần ImageNet của CINIC lấy từ ImageNet, nhưng
-chưa được loại trừ hoàn toàn.
+**Giới hạn của lớp bảo vệ 2.** Nó chỉ bắt ảnh **giống hệt từng pixel**. Ảnh gần giống (cùng bức ảnh nhưng bị nén, cắt lệch hay thu
+nhỏ khác đi) thì không bị loại.
+
+**Đã đo lại** bằng `documentation/tools/check_cinic_leak.py`:
+- Khoảng **5–8% ảnh test** có bản gần trùng trong CINIC. Ví dụ, 218 ảnh có tương quan ≥ 0,90 với một ảnh CINIC, và xem bằng mắt thì gần
+  như tất cả đúng là cùng một bức ảnh.
+- Tuy vậy, **không thấy dấu hiệu làm phồng accuracy**. Mô hình B, không học CINIC, cũng đoán nhóm ảnh này đúng hơn hẳn (87% so với 79%),
+  tức đó là ảnh dễ.
+- Bỏ các ảnh đó ra thì mọi mô hình giảm 0,1–0,4 điểm, B giảm nhiều nhất.
+
+Chi tiết: [15_CODE_REVIEW_NOTES.md](15_CODE_REVIEW_NOTES.md) mục B5.
 
 Trên laptop, `kiem_chung.py` tự tìm file tar trong `~/Downloads`, `data/` hoặc `/mnt/c/Users/*/Downloads/`, rồi gọi `prepare_cinic4.py`
 (hàm `ensure_cinic`, dòng 144–159).
@@ -176,10 +184,11 @@ Lặp CIFAR 2 lần để mạng vẫn thấy đủ ảnh "đúng kiểu CIFAR" 
 | val | 2.000 CIFAR | 256 | không | không | 8 |
 | test | 4.000 CIFAR | 256 | không | không | 16 |
 
-- Xáo trộn dùng `torch.Generator().manual_seed(config.SEED)` (dòng 103), nên thứ tự batch lặp lại được giữa các lần chạy.
+- Xáo trộn dùng `torch.Generator().manual_seed(seed)` (dòng 103), với `seed` = `train.py --seed` (mặc định `config.SEED` = 2027). Nhờ
+  vậy thứ tự batch lặp lại được giữa các lần chạy cùng seed, và đổi khi đổi seed.
 - `num_workers` để mặc định 0 (dữ liệu nạp trong tiến trình chính), nên các lệnh `np.random` trong `__getitem__` tuân theo seed của
-  `set_seed`. Nếu sau này tăng `num_workers`, phải cấp seed riêng cho từng worker, nếu không tăng cường ngẫu nhiên có thể bị lặp giữa các
-  worker (xem `15_CODE_REVIEW_NOTES.md`).
+  `set_seed`. Nếu sau này tăng `num_workers`, hàm `seed_worker` (dòng 111–115, gắn qua `worker_init_fn`) sẽ cấp seed riêng cho từng
+  worker để tăng cường ngẫu nhiên không bị lặp (xem [15_CODE_REVIEW_NOTES.md](15_CODE_REVIEW_NOTES.md) mục B2).
 
 ## 9. Dữ liệu ngày thi và ảnh thật (`predict_image.py`, `docs/model_spec.md`)
 
@@ -197,7 +206,8 @@ Ví dụ *minh hoạ*: ảnh 640×480 → cắt vùng giữa 480×480 (bỏ 80 p
 và golden model số nguyên, và script in ra hai dự đoán.
 
 Khác biệt "miền dữ liệu" giữa ảnh CIFAR và ảnh camera chưa được đo trong repo (chưa có thư mục `model/real_images/`), nên độ chính xác trên ảnh
-ngày thi **chưa xác định được**.
+ngày thi **chưa xác định được**. Script `model/anh_that.py` đo cả 5 mô hình một lần, ngay khi nhóm đặt ảnh vào `model/real_images/<lớp>/`
+(`docs/KIEM_CHUNG.md` Bước 4).
 
 ---
 

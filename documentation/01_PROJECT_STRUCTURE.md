@@ -29,6 +29,8 @@ lsi-design-contest-2027/
 │   ├── predict_image.py       dự đoán ảnh thật (jpg/png)
 │   ├── report.py              tiện ích ghi/thay một mục trong results.md
 │   ├── kiem_chung.py          ★ điều phối: chạy lại 5 mô hình, cập nhật bảng, commit/push
+│   ├── anh_that.py            đo cả 5 mô hình trên ảnh thật model/real_images/<lớp>/ (thêm 26/11)
+│   ├── nhieu_seed.py          chạy thêm seed cho một mô hình, tính trung bình ± độ lệch (thêm 26/11)
 │   ├── kiem_chung_log.json    trạng thái kiểm chứng từng mô hình (máy, ngày)
 │   ├── results.md             nhật ký kết quả mọi thí nghiệm (tự sinh)
 │   ├── README.md              mô tả các file trong model/
@@ -53,7 +55,7 @@ lsi-design-contest-2027/
 | `config.py` | 50 | Hằng số chung | `export_dir_for(arch)` (dòng 49–50) | – | – |
 | `prepare_cifar4.py` | 51 | **Xử lý dữ liệu** (tải, lọc 4 lớp) | `extract`, `main` | Internet (torchvision) | `data/cifar4.npz` |
 | `prepare_cinic4.py` | 67 | **Xử lý dữ liệu** (CINIC, chống lộ test) | `main` | `CINIC-10.tar.gz`, `cifar4.npz` | `data/cinic4_extra.npz` |
-| `data.py` | 137 | **Xử lý dữ liệu** khi huấn luyện | `load_arrays`, `split_train_val`, `to_tensor`, `Cifar4`, `strong_augment`, `get_loaders` | `data/*.npz` | (`figures/samples.png` khi chạy trực tiếp) |
+| `data.py` | 144 | **Xử lý dữ liệu** khi huấn luyện | `load_arrays`, `split_train_val`, `to_tensor`, `Cifar4`, `strong_augment`, `get_loaders`, `seed_worker` | `data/*.npz` | (`figures/samples.png` khi chạy trực tiếp) |
 | `net.py` | 162 | **Xây dựng mô hình** | `ARCHS`, `OPT_ARCHS`, `SmallCNN`, `VGGLite`, `build`, `count_params`, `count_macs` | – | – |
 | `train.py` | 266 | **Huấn luyện** | `train_one`, `opt_recipe`, `distill_loss`, `evaluate`, `save_curves`, `append_result` | data, checkpoint thầy, `--init` | `checkpoints/<run>.pt`, `_history.json`, `figures/train_<run>.png`, `results.md` |
 | `evaluate.py` | 105 | **Đánh giá** (float) | `load_model`, `predict_all`, `main` | checkpoint | `figures/confusion_*.png`, `errors_*.png`, `results.md` |
@@ -63,6 +65,8 @@ lsi-design-contest-2027/
 | `predict_image.py` | 75 | Thử ảnh thật | `load_32x32`, `main` | ảnh, checkpoint, qparams | (in màn hình) |
 | `report.py` | 18 | **Lưu kết quả** (ghi một mục vào results.md) | `update_section` | `results.md` | `results.md` |
 | `kiem_chung.py` | 591 | **Điều phối 5 mô hình** | `MODELS`, `verify_model`, `run_step`, `build_table`, `hw_numbers`, `golden_check`, `commit_push` | mọi thứ trên | `kiem_chung_log.json`, `docs/so_sanh_5_mo_hinh.md`, `figures/so_sanh_5_mo_hinh.png`, mục đầu `results.md`, git |
+| `anh_that.py` | 114 | **Đánh giá trên ảnh thật** (5 mô hình) | `load_images`, `int_predict`, `float_predict`, `main` | `model/real_images/<lớp>/`, qparams (+ checkpoint nếu có) | mục "Ảnh thật" trong `results.md` |
+| `nhieu_seed.py` | 140 | **Huấn luyện lại nhiều seed** | `seeded`, `stages_for`, `write_section`, `main` (dùng `run_step`, `golden_check` của `kiem_chung.py`) | data, checkpoint thầy | checkpoint/qparams `*_s<seed>`, mục "Nhiều seed" trong `results.md`, `kiem_chung_log.json` |
 
 ## 3. Bảng liên kết: công đoạn → file Python
 
