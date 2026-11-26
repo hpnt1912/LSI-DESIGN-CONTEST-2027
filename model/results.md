@@ -692,3 +692,19 @@ Kiến trúc **E3d_deep5+cinic60_kdft**. Trọng số int8 (riêng conv1: int16)
 | conv4 | 5 | 8 | 5 | 8 | [64, 64, 3, 3] | [-81, 100] |
 | conv5 | 5 | 8 | 6 | 7 | [112, 64, 3, 3] | [-67, 83] |
 | fc | 6 | 8 | – | – | [4, 1792] | [-78, 57] |
+
+## Ảnh thật (model/real_images)
+
+> Ghi bởi `python model/anh_that.py` trên máy `LAPTOP-2RM30BH4` (2026-11-26 19:12). Thư mục: `real_images/`; 108 ảnh: cat 26, dog 26, deer 27, horse 29.
+
+| Mô hình | Test CIFAR (số nguyên) | **Ảnh thật (số nguyên)** ± khoảng tin cậy 95% | Ảnh thật (float) | Chênh (thật − CIFAR, điểm %) | cat / dog / deer / horse (%) |
+|---|---|---|---|---|---|
+| **B** | 80,00% | **82,4%** ± 7 | 81,5% | +2,4 | 81 / 73 / 96 / 79 |
+| **B3c** | 87,60% | **91,7%** ± 5 | 92,6% | +4,1 | 85 / 88 / 96 / 97 |
+| **E** | 90,65% | **95,4%** ± 4 | 95,4% | +4,7 | 88 / 100 / 100 / 93 |
+| **E2** | 89,60% | **97,2%** ± 3 | 95,4% | +7,6 | 92 / 96 / 100 / 100 |
+| **E3d** | 90,25% | **96,3%** ± 4 | 94,4% | +6,0 | 92 / 96 / 100 / 97 |
+
+Với 108 ảnh, khoảng tin cậy rộng (± ở cột 3): chỉ chênh lệch lớn hơn khoảng đó mới đáng tin. Điều cần xem là mô hình nào tụt mạnh so với CIFAR.
+
+Ảnh cả 5 mô hình đều đoán sai (0): không có.
