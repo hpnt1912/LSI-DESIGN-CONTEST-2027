@@ -1,0 +1,151 @@
+{
+  "arch": "E3d_deep5+cinic_ema_ft",
+  "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
+  "layers": [
+    {
+      "name": "conv1",
+      "type": "conv",
+      "f_in": 8,
+      "fw": 12,
+      "f_acc": 20,
+      "wbits": 16,
+      "f_out": 5,
+      "shift": 15,
+      "a_max": 7.642511369665895,
+      "pool": true,
+      "w_shape": [
+        24,
+        3,
+        3,
+        3
+      ],
+      "w_range": [
+        -30567,
+        25472
+      ],
+      "b_range": [
+        -1195866,
+        934737
+      ]
+    },
+    {
+      "name": "conv2",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 8,
+      "f_acc": 13,
+      "f_out": 5,
+      "shift": 8,
+      "a_max": 4.08877951303571,
+      "pool": true,
+      "w_shape": [
+        48,
+        24,
+        3,
+        3
+      ],
+      "w_range": [
+        -109,
+        126
+      ],
+      "b_range": [
+        -6283,
+        12705
+      ]
+    },
+    {
+      "name": "conv3",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 7,
+      "f_acc": 12,
+      "f_out": 5,
+      "shift": 7,
+      "a_max": 4.946080467996896,
+      "pool": false,
+      "w_shape": [
+        64,
+        48,
+        3,
+        3
+      ],
+      "w_range": [
+        -70,
+        82
+      ],
+      "b_range": [
+        -5638,
+        5487
+      ]
+    },
+    {
+      "name": "conv4",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 8,
+      "f_acc": 13,
+      "f_out": 5,
+      "shift": 8,
+      "a_max": 4.667814658491868,
+      "pool": false,
+      "w_shape": [
+        64,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -88,
+        100
+      ],
+      "b_range": [
+        -10513,
+        9984
+      ]
+    },
+    {
+      "name": "conv5",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 8,
+      "f_acc": 13,
+      "f_out": 6,
+      "shift": 7,
+      "a_max": 2.2728931553425933,
+      "pool": true,
+      "w_shape": [
+        112,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -47,
+        66
+      ],
+      "b_range": [
+        -7935,
+        6765
+      ]
+    },
+    {
+      "name": "fc",
+      "type": "linear",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "w_shape": [
+        4,
+        1792
+      ],
+      "w_range": [
+        -57,
+        73
+      ],
+      "b_range": [
+        -7407,
+        5330
+      ]
+    }
+  ]
+}
