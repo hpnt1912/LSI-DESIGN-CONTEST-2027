@@ -47,6 +47,10 @@
 | E2_lite+cinic60_kdft | 138,372 | 12,689,408 | 135.1 | 15 | 90.20% | 90.00% | 5.7 phút |
 | E3d_deep5+cinic60 | 147,524 | 11,582,464 | 144.1 | 60 | 90.80% | 89.65% | 91.0 phút |
 | E3d_deep5+cinic60_kdft | 147,524 | 11,582,464 | 144.1 | 15 | 90.70% | 90.20% | 5.2 phút |
+| B3c_c4x4_128+cinic_s2 | 105,636 | 3,989,504 | 103.2 | 30 | 87.00% | 85.67% | 27.0 phút |
+| B3c_c4x4_128+cinic_ft_s2 | 105,636 | 3,989,504 | 103.2 | 15 | 88.65% | 86.72% | 2.1 phút |
+| B3c_c4x4_128+cinic_s3 | 105,636 | 3,989,504 | 103.2 | 30 | 86.75% | 85.72% | 28.9 phút |
+| B3c_c4x4_128+cinic_ft_s3 | 105,636 | 3,989,504 | 103.2 | 15 | 87.65% | 86.85% | 2.2 phút |
 
 ## Đánh giá chi tiết (float)
 
@@ -708,3 +712,59 @@ Kiến trúc **E3d_deep5+cinic60_kdft**. Trọng số int8 (riêng conv1: int16)
 Với 108 ảnh, khoảng tin cậy rộng (± ở cột 3): chỉ chênh lệch lớn hơn khoảng đó mới đáng tin. Điều cần xem là mô hình nào tụt mạnh so với CIFAR.
 
 Ảnh cả 5 mô hình đều đoán sai (0): không có.
+
+## Lượng tử hoá (int8) – B3c_c4x4_128+cinic_ft_s2
+
+Kiến trúc **B3c_c4x4_128+cinic_ft_s2**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 3.6e-06 |
+| Accuracy float (sau gộp BN) | 86.72% |
+| Accuracy số nguyên (golden model) | 86.98% |
+| Chênh lệch (số nguyên − float) | +0.25 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.5% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (số nguyên) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 12 | 5 | 15 | [16, 3, 3, 3] | [-28983, 23775] |
+| conv2 | 5 | 7 | 5 | 7 | [32, 16, 3, 3] | [-79, 79] |
+| conv3 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-49, 97] |
+| conv4 | 6 | 8 | 6 | 8 | [128, 64, 3, 3] | [-84, 109] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-68, 70] |
+
+## Lượng tử hoá (int8) – B3c_c4x4_128+cinic_ft_s3
+
+Kiến trúc **B3c_c4x4_128+cinic_ft_s3**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
+
+| Bước | Kết quả |
+|---|---|
+| BN folding – sai khác logit lớn nhất | 4.8e-06 |
+| Accuracy float (sau gộp BN) | 86.85% |
+| Accuracy số nguyên (golden model) | 86.60% |
+| Chênh lệch (số nguyên − float) | -0.25 điểm % |
+| Trùng dự đoán float ↔ số nguyên | 98.4% |
+| golden_int.py ↔ PyTorch trùng từng bit | Có |
+
+| Tầng | f_in | fw | f_out | shift | Kích thước W | Khoảng W (số nguyên) |
+|---|---|---|---|---|---|---|
+| conv1 | 8 | 12 | 4 | 16 | [16, 3, 3, 3] | [-28507, 30302] |
+| conv2 | 4 | 7 | 5 | 6 | [32, 16, 3, 3] | [-68, 96] |
+| conv3 | 5 | 7 | 6 | 6 | [64, 32, 3, 3] | [-56, 108] |
+| conv4 | 6 | 7 | 6 | 7 | [128, 64, 3, 3] | [-40, 67] |
+| fc | 6 | 8 | – | – | [4, 2048] | [-91, 74] |
+
+## Nhiều seed – B3c
+
+> Ghi bởi `python model/nhieu_seed.py B3c` trên máy `LAPTOP-2RM30BH4` (2026-11-26 20:22). Mỗi seed chạy đúng công thức của lượt chính (`B3c_c4x4_128+cinic_ft`), chỉ khác `--seed`.
+
+| Seed | Lượt chạy cuối | Val float | Test float | Test số nguyên | cat / dog / deer / horse (số nguyên) | Thời gian huấn luyện |
+|---|---|---|---|---|---|---|
+| 2027 (lượt chính) | `B3c_c4x4_128+cinic_ft` | 87,30% | 87,67% | **87,60%** | 79,7 / 85,2 / 93,1 / 92,4 | 28,9 phút |
+| 2 | `B3c_c4x4_128+cinic_ft_s2` | 88,65% | 86,72% | **86,98%** | 77,0 / 85,1 / 92,5 / 93,3 | 29,1 phút |
+| 3 | `B3c_c4x4_128+cinic_ft_s3` | 87,65% | 86,85% | **86,60%** | 77,7 / 84,8 / 91,5 / 92,4 | 31,1 phút |
+
+**3 lần chạy – test số nguyên: 87,06% ± 0,51** (trung bình ± độ lệch chuẩn), thấp nhất 86,60%, cao nhất 87,60%. Test float: 87,08% ± 0,52.
+
+Cách dùng khi so sánh: dùng **trung bình** thay cho số của một lần chạy; hai mô hình chênh nhau ít hơn khoảng độ lệch chuẩn thì coi như tương đương.

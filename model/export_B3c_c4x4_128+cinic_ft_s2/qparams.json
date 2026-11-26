@@ -1,0 +1,126 @@
+{
+  "arch": "B3c_c4x4_128+cinic_ft_s2",
+  "input": "pixel uint8, f=8 (x = pixel/256), thứ tự kênh R,G,B",
+  "layers": [
+    {
+      "name": "conv1",
+      "type": "conv",
+      "f_in": 8,
+      "fw": 12,
+      "f_acc": 20,
+      "wbits": 16,
+      "f_out": 5,
+      "shift": 15,
+      "a_max": 7.284022106111161,
+      "pool": true,
+      "w_shape": [
+        16,
+        3,
+        3,
+        3
+      ],
+      "w_range": [
+        -28983,
+        23775
+      ],
+      "b_range": [
+        -530038,
+        1028789
+      ]
+    },
+    {
+      "name": "conv2",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 7,
+      "f_acc": 12,
+      "f_out": 5,
+      "shift": 7,
+      "a_max": 4.537976132481678,
+      "pool": true,
+      "w_shape": [
+        32,
+        16,
+        3,
+        3
+      ],
+      "w_range": [
+        -79,
+        79
+      ],
+      "b_range": [
+        -5683,
+        6405
+      ]
+    },
+    {
+      "name": "conv3",
+      "type": "conv",
+      "f_in": 5,
+      "fw": 7,
+      "f_acc": 12,
+      "f_out": 6,
+      "shift": 6,
+      "a_max": 3.319457976695209,
+      "pool": true,
+      "w_shape": [
+        64,
+        32,
+        3,
+        3
+      ],
+      "w_range": [
+        -49,
+        97
+      ],
+      "b_range": [
+        -7196,
+        7592
+      ]
+    },
+    {
+      "name": "conv4",
+      "type": "conv",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "f_out": 6,
+      "shift": 8,
+      "a_max": 3.2021894113908513,
+      "pool": false,
+      "w_shape": [
+        128,
+        64,
+        3,
+        3
+      ],
+      "w_range": [
+        -84,
+        109
+      ],
+      "b_range": [
+        -13953,
+        15783
+      ]
+    },
+    {
+      "name": "fc",
+      "type": "linear",
+      "f_in": 6,
+      "fw": 8,
+      "f_acc": 14,
+      "w_shape": [
+        4,
+        2048
+      ],
+      "w_range": [
+        -68,
+        70
+      ],
+      "b_range": [
+        -7110,
+        5678
+      ]
+    }
+  ]
+}

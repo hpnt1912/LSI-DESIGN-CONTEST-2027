@@ -57,5 +57,25 @@
     "ngay": "2026-11-26 01:38",
     "may": "LAPTOP-2RM30BH4",
     "ghi_chu": "Chạy bằng kiem_chung.py"
+  },
+  "nhieu_seed": {
+    "runs": [
+      "B3c_c4x4_128+cinic_s2",
+      "B3c_c4x4_128+cinic_ft_s2",
+      "B3c_c4x4_128+cinic_s3",
+      "B3c_c4x4_128+cinic_ft_s3"
+    ],
+    "xong": {
+      "B3c_s2": [
+        0,
+        1,
+        2
+      ],
+      "B3c_s3": [
+        0,
+        1,
+        2
+      ]
+    }
   }
 }
