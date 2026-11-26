@@ -2,20 +2,20 @@
 
 ## 5 mô hình chính (đang dùng)
 
-> Mục này **tự sinh** bởi `python model/kiem_chung.py` (cập nhật 2026-11-26 08:33). Bảng đầy đủ: [`docs/so_sanh_5_mo_hinh.md`](../docs/so_sanh_5_mo_hinh.md); cách kiểm chứng: [`docs/KIEM_CHUNG.md`](../docs/KIEM_CHUNG.md).
+> Mục này **tự sinh** bởi `python model/kiem_chung.py` (cập nhật 2026-11-26 21:41). Bảng đầy đủ: [`docs/so_sanh_5_mo_hinh.md`](../docs/so_sanh_5_mo_hinh.md); cách kiểm chứng: [`docs/KIEM_CHUNG.md`](../docs/KIEM_CHUNG.md).
 > Các bảng và mục bên dưới là nhật ký mọi thí nghiệm (kể cả mô hình không dùng).
 
 | Mã | Vai trò | Lượt chạy (tên mục chi tiết bên dưới) | Test float | Test số nguyên (FPGA) | MAC/ảnh | Trọng số | Trạng thái |
 |---|---|---|---|---|---|---|---|
 | **B** | Cơ bản (~80%) | `B_16_32_64` | 80,23% | **80,00%** | 2,8 triệu | 27,4 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 20:34) |
-| **B3c** | Nhanh | `B3c_c4x4_128+cinic_ft` | 87,67% | **87,60%** | 4,0 triệu | 104,3 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 21:06) |
+| **B3c** | ★ CHỌN ĐI THI (nhanh) | `B3c_c4x4_128+cinic_ft` | 87,67% | **87,60%** | 4,0 triệu | 104,3 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 21:06) |
 | **E** | Chính xác cao (+ mạng thầy cho E2, E3d) | `E_opt_cnn+cinic_ft` | 90,45% | **90,65%** | 19,8 triệu | 136,8 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 22:20) |
 | **E2** | Cân bằng | `E2_lite+cinic60_kdft` | 90,00% | **89,60%** | 12,7 triệu | 136,8 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-25 23:59) |
 | **E3d** | Thử nghiệm mới (5 conv) | `E3d_deep5+cinic60_kdft` | 90,20% | **90,25%** | 11,6 triệu | 145,6 KB | ✅ Đã kiểm chứng trên máy `LAPTOP-2RM30BH4` (2026-11-26 01:38) |
 
 ## So sánh kiến trúc (float)
 
-> ✅ **Chạy thật trên máy nhóm**: `A_8_16_32`, `C_32_64_128`, `D_16_32_64_noBN`, `B_16_32_64`, `B3c_c4x4_128+cinic`, `B3c_c4x4_128+cinic_ft`, `E_opt_cnn+cinic`, `E_opt_cnn+cinic_ft`, `E2_lite+cinic60`, `E2_lite+cinic60_kdft`, `E3d_deep5+cinic60`, `E3d_deep5+cinic60_kdft`.
+> ✅ **Chạy thật trên máy nhóm**: `A_8_16_32`, `C_32_64_128`, `D_16_32_64_noBN`, `B_16_32_64`, `B3c_c4x4_128+cinic`, `B3c_c4x4_128+cinic_ft`, `E_opt_cnn+cinic`, `E_opt_cnn+cinic_ft`, `E2_lite+cinic60`, `E2_lite+cinic60_kdft`, `E3d_deep5+cinic60`, `E3d_deep5+cinic60_kdft`, `B3c_c4x4_128+cinic_s2`, `B3c_c4x4_128+cinic_ft_s2`, `B3c_c4x4_128+cinic_s3`, `B3c_c4x4_128+cinic_ft_s3`.
 
 > ⚠️ **Số do AI chạy trên máy cloud** – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo: `E_opt_cnn`, `B2_16_32_64_opt`, `B3a_c4x4_64`, `B3_kd_16_32_64`, `B3b_dbl8_64`, `B3c_c4x4_128`, `E2_lite+cinic`, `E2_lite+cinic_ft`, `B2_16_32_64_opt+cinic`, `B2_16_32_64_opt+cinic_ft`, `E2_lite+cinic_s2`, `E2_lite+cinic60_ft`, `E2_lite+cinic_s2_ft`, `E2_lite+cinic_s2_kdft`.
 
@@ -715,6 +715,8 @@ Với 108 ảnh, khoảng tin cậy rộng (± ở cột 3): chỉ chênh lệch
 
 ## Lượng tử hoá (int8) – B3c_c4x4_128+cinic_ft_s2
 
+> ✅ **Chạy thật trên máy nhóm** (`B3c_c4x4_128+cinic_ft_s2`).
+
 Kiến trúc **B3c_c4x4_128+cinic_ft_s2**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 
 | Bước | Kết quả |
@@ -735,6 +737,8 @@ Kiến trúc **B3c_c4x4_128+cinic_ft_s2**. Trọng số int8 (riêng conv1: int1
 | fc | 6 | 8 | – | – | [4, 2048] | [-68, 70] |
 
 ## Lượng tử hoá (int8) – B3c_c4x4_128+cinic_ft_s3
+
+> ✅ **Chạy thật trên máy nhóm** (`B3c_c4x4_128+cinic_ft_s3`).
 
 Kiến trúc **B3c_c4x4_128+cinic_ft_s3**. Trọng số int8 (riêng conv1: int16), activation uint8, bias/tổng tích luỹ int32, thang là lũy thừa của 2 (theo từng tầng).
 

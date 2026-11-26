@@ -24,6 +24,23 @@
 - Chỉ dùng các phép: Conv 3×3, ReLU, MaxPool 2×2, Fully connected (theo tài liệu lần 23)
 - Lượng tử hóa: trọng số int8, activation uint8 (sau ReLU), bias/tổng tích luỹ int32, thang lũy thừa của 2 theo từng tầng
 
+## ★ Mô hình chọn đi thi: B3c_c4x4_128+cinic_ft (chốt 26/11/2026)
+
+| Mục | Giá trị (laptop nhóm) |
+|---|---|
+| Kiến trúc | Conv 3→16 → Pool → Conv 16→32 → Pool → Conv 32→64 → Pool → Conv 64→128 (ở 4×4, không pool) → flatten 2048 → Linear 2048→4 (mọi Conv có BN + ReLU; BN gộp vào Conv khi lượng tử) |
+| Test CIFAR-4, số nguyên (= FPGA) | **87,06% ± 0,51** (3 seed: 87,60 / 86,98 / 86,60) |
+| Ảnh thật (108 ảnh, qua tiền xử lý 32×32) | 91,7% ± 5 (khoảng tin cậy 95%) |
+| Phép nhân–cộng / ảnh | 4,0 triệu (E/E2/E3d: 11,6–19,8 triệu) |
+| Trọng số | ~104 KB (conv1 int16, còn lại int8; bias int32); BRAM ước lượng ~55% |
+| File cho RTL | `model/export_B3c_c4x4_128+cinic_ft/` (`.mem`, `params.npz`, testvec) |
+| Huấn luyện lại | `python model/kiem_chung.py B3c` (xem `docs/KIEM_CHUNG.md`) |
+
+Lý do chọn: cuộc thi chấm chủ yếu tốc độ. B3c ít phép tính nhất trong các mô hình >85% – nhanh gấp ~3–5 lần
+E/E2/E3d – đổi lại thấp hơn chúng ~3 điểm %. So với B (80%), B3c chỉ thêm ~40% phép tính nhưng hơn ~7 điểm.
+Lưu ý khi báo cáo: B3c học thêm ảnh CINIC-10 (ImageNet 32×32); đã loại ảnh trùng tập test, phần ảnh gần trùng
+(5–8%) chỉ làm lệch 0,1–0,4 điểm (xem `documentation/15_CODE_REVIEW_NOTES.md`, mục B5).
+
 ## Kết quả đã kiểm chứng trên laptop của nhóm (25–26/11/2026)
 
 Test 4.000 ảnh CIFAR-4; "số nguyên" = kết quả golden model = kết quả FPGA. Chi tiết: `docs/so_sanh_5_mo_hinh.md`.
@@ -31,13 +48,13 @@ Test 4.000 ảnh CIFAR-4; "số nguyên" = kết quả golden model = kết qu�
 | Mô hình | Vai trò | Float | Số nguyên | MAC/ảnh | Trọng số | Dữ liệu |
 |---|---|---|---|---|---|---|
 | B_16_32_64 | Cơ bản | 80,23% | 80,00% | 2,8 triệu | 27 KB | CIFAR |
-| B3c_c4x4_128+cinic_ft | Nhanh | 87,67% | 87,60% | 4,0 triệu | 104 KB | CIFAR + CINIC-10 |
+| **B3c_c4x4_128+cinic_ft** | **★ Chọn đi thi** | 87,67% | 87,60% | 4,0 triệu | 104 KB | CIFAR + CINIC-10 |
 | E_opt_cnn+cinic_ft | Chính xác cao | 90,45% | 90,65% | 19,8 triệu | 137 KB | CIFAR + CINIC-10 |
 | E2_lite+cinic60_kdft | Cân bằng | 90,00% | 89,60% | 12,7 triệu | 137 KB | CIFAR + CINIC-10 |
 | E3d_deep5+cinic60_kdft | Thử nghiệm mới | 90,20% | 90,25% | 11,6 triệu | 146 KB | CIFAR + CINIC-10 |
 
 - Golden model của cả 5 mô hình trùng từng bit với cách tính thứ hai bằng PyTorch.
-- Các bản dùng CINIC vượt ngân sách trọng số 100 KB ở trên (BRAM ước lượng 55–79%) – cần kiểm tra khi thiết kế RTL.
+- Các bản dùng CINIC vượt ngân sách trọng số 100 KB ở trên (BRAM ước lượng 55–79%); B3c vượt nhẹ (104 KB, ~55%) – chấp nhận được, kiểm tra lại khi thiết kế RTL.
 - Hướng dẫn học: `docs/HuongDan_MoHinh_CNN_Python.docx`; cách kiểm chứng lại: `docs/KIEM_CHUNG.md`.
 
 ## Tiêu chí đánh giá

@@ -25,9 +25,17 @@ EPOCHS = 30                 # số lần duyệt hết tập train
 LR = 1e-3                   # tốc độ học (learning rate) ban đầu
 WEIGHT_DECAY = 5e-4         # phạt trọng số lớn (L2 regularization)
 
-# ---- Mô hình chọn để đưa xuống phần cứng ------------------------------------------
-# Tên phải có trong net.ARCHS. Đổi sau khi so sánh kiến trúc (xem results.md).
+# ---- Mô hình mặc định của các script (dùng khi KHÔNG ghi --arch) ----------------------
+# Giữ B_16_32_64 – mô hình học theo file hướng dẫn (công thức gốc, 30 epoch). Không đổi sang B3c vì
+# `python model/train.py` không --arch sẽ huấn luyện sai công thức (B3c cần --recipe opt + CINIC + tinh chỉnh).
 CHOSEN_ARCH = "B_16_32_64"
+
+# ---- ★ MÔ HÌNH CHỌN ĐI THI (chốt 26/11/2026) --------------------------------------------
+# Đưa xuống FPGA: tham số + file .mem ở model/export_B3c_c4x4_128+cinic_ft/ ; conv1 dùng trọng số int16.
+# Kết quả trên laptop nhóm: test số nguyên 87,06% ± 0,51 (3 seed), ảnh thật 91,7% (108 ảnh), 4,0 triệu MAC/ảnh.
+# Huấn luyện lại: python model/kiem_chung.py B3c   (xem docs/KIEM_CHUNG.md)
+CONTEST_ARCH = "B3c_c4x4_128+cinic_ft"
+CONTEST_CONV1_BITS = 16
 
 # ---- Công thức huấn luyện opt (B3c, E, E2, E3d; ban đầu thử ở nhánh exp/opt-acc-90) -----------
 # Chỉ dùng khi chạy  train.py --recipe opt ; công thức gốc ở trên không đổi.

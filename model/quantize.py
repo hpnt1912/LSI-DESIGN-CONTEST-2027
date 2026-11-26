@@ -164,8 +164,8 @@ def torch_int_forward(q_layers, x_uint8):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arch", default=config.CHOSEN_ARCH)
-    ap.add_argument("--conv1-bits", type=int, choices=[8, 16], default=8,
-                    help="số bit trọng số của tầng conv1 (mặc định 8 như cũ)")
+    ap.add_argument("--conv1-bits", type=int, choices=[8, 16], default=None,
+                    help="số bit trọng số của tầng conv1 (mặc định: 16 nếu tên có +cinic, còn lại 8)")
     args = ap.parse_args()
     arch = args.arch
     out_dir = config.export_dir_for(arch)        # A–D: model/export/ ; kiến trúc mới: model/export_<arch>/
@@ -187,7 +187,9 @@ def main():
     # 2–4) Hiệu chuẩn + lượng tử hoá
     rng = np.random.default_rng(config.SEED)
     calib = to_t(x_tr[rng.choice(len(x_tr), 2000, replace=False)])
-    q_layers = quantize(layers, calib, args.conv1_bits)
+    # không ghi --conv1-bits: bản dùng CINIC (+cinic...) mặc định int16 như lúc kiểm chứng, còn lại int8
+    conv1_bits = args.conv1_bits or (16 if "+cinic" in arch else 8)
+    q_layers = quantize(layers, calib, conv1_bits)
     save_qparams(q_layers, arch, out_dir)
     print("[2-4] Tham số từng tầng:")
     for q in q_layers:
@@ -209,7 +211,7 @@ def main():
     rows = "\n".join(
         f"| {q['name']} | {q['f_in']} | {q['fw']} | {q.get('f_out', '–')} | {q.get('shift', '–')} | "
         f"{list(q['w'].shape)} | [{q['w'].min()}, {q['w'].max()}] |" for q in q_layers)
-    w_note = "int8" if args.conv1_bits == 8 else "int8 (riêng conv1: int16)"
+    w_note = "int8" if conv1_bits == 8 else "int8 (riêng conv1: int16)"
     body = (f"Kiến trúc **{arch}**. Trọng số {w_note}, activation uint8, bias/tổng tích luỹ int32, "
             f"thang là lũy thừa của 2 (theo từng tầng).\n\n"
             f"| Bước | Kết quả |\n|---|---|\n"

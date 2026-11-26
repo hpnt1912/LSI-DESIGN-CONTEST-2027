@@ -50,6 +50,8 @@ Kết quả nằm trong `reports/` (utilization, timing summary).
 
 ## Tài liệu
 
+- **★ Mô hình chọn đi thi: `B3c_c4x4_128+cinic_ft`** – 87,1% ± 0,5 (số nguyên, 3 seed), ảnh thật 91,7%, 4,0 triệu MAC/ảnh; tham số cho RTL ở `model/export_B3c_c4x4_128+cinic_ft/`. Chi tiết: [`docs/model_spec.md`](docs/model_spec.md)
+
 - **Hướng dẫn A–Z mô hình Python (Word):** [`docs/HuongDan_MoHinh_CNN_Python.docx`](docs/HuongDan_MoHinh_CNN_Python.docx)
 - Kết quả thí nghiệm: [`model/results.md`](model/results.md)
 - **5 mô hình chính – đã chạy thật trên laptop** (B 80,00% · B3c 87,60% · E 90,65% · E2 89,60% · E3d 90,25%, số nguyên): [`docs/so_sanh_5_mo_hinh.md`](docs/so_sanh_5_mo_hinh.md) – cách kiểm chứng: [`docs/KIEM_CHUNG.md`](docs/KIEM_CHUNG.md)

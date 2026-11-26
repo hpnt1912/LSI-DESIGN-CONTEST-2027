@@ -25,6 +25,15 @@
 - [ ] **Ngày 13 – Ảnh thật.** Ảnh chụp/ảnh web resize 32×32 trong `model/real_images/<lớp>/`, đo accuracy.
 - [ ] **Ngày 14 – Báo cáo cho thầy.**
 
+## Trạng thái (26/11/2026)
+
+- [x] Code mô hình Python đầy đủ: huấn luyện, đánh giá, lượng tử, golden model, xuất `.mem`, ảnh thật, nhiều seed.
+- [x] Kiểm chứng 5 mô hình chính trên laptop nhóm (`docs/so_sanh_5_mo_hinh.md`).
+- [x] **Chốt mô hình đi thi: B3c_c4x4_128+cinic_ft** (87,1% ± 0,5; ảnh thật 91,7%; 4,0 triệu MAC) – `docs/model_spec.md`.
+- [ ] Nhóm đọc hiểu code + tài liệu theo Ngày 1–13 ở trên (đánh dấu từng ngày khi hiểu).
+- [ ] Ngày 14: báo cáo cho thầy → xong giai đoạn Python.
+- Giai đoạn tiếp: RTL cho B3c (conv 3×3, ReLU, maxpool, linear, requant) – mỗi module có testbench so với `model/golden_int.py`.
+
 ## Ghi chú
 
 - Ngày 9–11 là phần khó nhất; khi tới đó nên dùng model Claude mạnh hơn.

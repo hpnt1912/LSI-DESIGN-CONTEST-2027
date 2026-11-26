@@ -1,17 +1,19 @@
 # So sánh 5 mô hình chính – LSI Design Contest 2027
 
 > File này **tự sinh** bởi `python model/kiem_chung.py` – không sửa tay (sửa sẽ bị ghi đè).
-> Cập nhật lần cuối: 2026-11-26 08:33. Số liệu từng mô hình lấy từ máy ghi ở dòng **Trạng thái**.
+> Cập nhật lần cuối: 2026-11-26 21:41. Số liệu từng mô hình lấy từ máy ghi ở dòng **Trạng thái**.
 
 Mọi accuracy đo trên **4.000 ảnh test CIFAR-4**. "Test số nguyên" = kết quả của `golden_int.py`, tức đúng kết
 quả mạch FPGA sẽ cho ra. Quy trình kiểm chứng: [`docs/KIEM_CHUNG.md`](KIEM_CHUNG.md).
 
 ## Bảng so sánh
 
-| | **B**<br>Cơ bản (~80%) | **B3c**<br>Nhanh | **E**<br>Chính xác cao (+ mạng thầy cho E2, E3d) | **E2**<br>Cân bằng | **E3d**<br>Thử nghiệm mới (5 conv) |
+| | **B**<br>Cơ bản (~80%) | **B3c**<br>★ CHỌN ĐI THI (nhanh) | **E**<br>Chính xác cao (+ mạng thầy cho E2, E3d) | **E2**<br>Cân bằng | **E3d**<br>Thử nghiệm mới (5 conv) |
 |---|---|---|---|---|---|
 | Tên lượt chạy (thư mục `model/export*`) | `B_16_32_64` | `B3c_c4x4_128+cinic_ft` | `E_opt_cnn+cinic_ft` | `E2_lite+cinic60_kdft` | `E3d_deep5+cinic60_kdft` |
 | **Test số nguyên** (đúng kết quả FPGA) | **80,00%** | **87,60%** | **90,65%** | **89,60%** | **90,25%** |
+| Test số nguyên – trung bình nhiều seed | chưa chạy | **87,06% ± 0,51** (3 seed) | chưa chạy | chưa chạy | chưa chạy |
+| Ảnh thật 108 ảnh (số nguyên, ± khoảng tin cậy 95%) | 82,4% ± 7 | 91,7% ± 5 | 95,4% ± 4 | 97,2% ± 3 | 96,3% ± 4 |
 | Test float (PyTorch) | 80,23% | 87,67% | 90,45% | 90,00% | 90,20% |
 | Val float (dùng để chọn) | 81,55% | 87,30% | 90,45% | 90,20% | 90,70% |
 | Số đã ghi trước đây (float / số nguyên) | 80,23% / 80,00% | 87,08% / 87,20% | 90,65% / 90,60% | 90,33% / 90,30% | – |
@@ -65,7 +67,9 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 ## Ghi chú từng mô hình
 
 - **B – Cơ bản:** mô hình nhóm đã học (3 conv). Dễ hiểu, nhỏ, nhanh; độ chính xác ~80%.
-- **B3c – Nhanh:** thân B + 1 conv 64→128 ở 4×4. Ít phép tính nhất trong nhóm >85%. Cần CINIC.
+- **B3c – ★ CHỌN ĐI THI (chốt 26/11/2026):** thân B + 1 conv 64→128 ở 4×4. Ít phép tính nhất trong nhóm >85%
+  (4,0 triệu MAC – nhanh gấp ~3–5 lần E/E2/E3d), BRAM ~55% nên còn chỗ cho phần điều khiển. Cần CINIC.
+  Lý do chọn: cuộc thi chấm chủ yếu tốc độ; B3c đổi ~3 điểm % độ chính xác lấy tốc độ gấp nhiều lần.
 - **E – Chính xác cao:** VGG rút gọn, cặp conv kép ở 16×16. Chậm nhất; **cũng là mạng thầy** (distillation) cho
   E2 và E3d, nên phải chạy E trước.
 - **E2 – Cân bằng:** như E nhưng cặp conv kép ở 8×8 → cùng tham số, ít hơn 36% phép tính.

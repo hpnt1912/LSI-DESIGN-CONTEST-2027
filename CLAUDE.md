@@ -6,6 +6,7 @@ Dự án thi LSI Design Contest in Hokkaido 2027: phần cứng CNN phân loại
 - Chip mục tiêu: **AMD Spartan-7 XC7S25CSGA225-1** (part `xc7s25csga225-1`). Mọi thiết kế phải tổng hợp vừa chip này.
 - Công cụ: Vivado ML Standard 2025.2 (chạy trên Windows).
 - Đầu vào ảnh 32×32 RGB; 4 lớp theo thứ tự chỉ số: 0 cat, 1 dog, 2 deer, 3 horse.
+- **Mô hình chọn đi thi: `B3c_c4x4_128+cinic_ft`** (`config.CONTEST_ARCH`; conv1 int16). RTL làm theo tham số ở `model/export_B3c_c4x4_128+cinic_ft/`. `config.CHOSEN_ARCH` (= B) chỉ là mặc định của script khi học theo hướng dẫn.
 - Board ZERO7 là HAT gắn GPIO 40 chân của Raspberry Pi 5; Pi lo camera và hiển thị.
 
 ## Tài liệu dự án (đọc khi cần)

@@ -27,6 +27,7 @@ import platform
 import subprocess
 import sys
 import time
+import re
 from pathlib import Path
 
 import config
@@ -34,6 +35,7 @@ import config
 REPO = config.REPO_ROOT
 LOG_FILE = REPO / "model" / "kiem_chung_log.json"
 DOC_FILE = REPO / "docs" / "so_sanh_5_mo_hinh.md"
+RESULTS_FILE = REPO / "model" / "results.md"
 FIG_FILE = config.FIG_DIR / "so_sanh_5_mo_hinh.png"
 CINIC_NPZ = REPO / "data" / "cinic4_extra.npz"
 PY = sys.executable
@@ -61,7 +63,7 @@ MODELS = {
         stages=[["train.py", "--arch", "B_16_32_64"]] + stages_after_train("B_16_32_64", 8),
         ai_ref=dict(float=80.23, int=80.00, phut=4.3), du_kien="khoảng 5–10 phút"),
     "B3c": dict(
-        run="B3c_c4x4_128+cinic_ft", vai_tro="Nhanh", conv1_bits=16, cinic=True, needs_teacher=False,
+        run="B3c_c4x4_128+cinic_ft", vai_tro="★ CHỌN ĐI THI (nhanh)", conv1_bits=16, cinic=True, needs_teacher=False,
         train_runs=["B3c_c4x4_128+cinic", "B3c_c4x4_128+cinic_ft"],
         stages=[["train.py", "--arch", "B3c_c4x4_128+cinic", *EXTRA, "--epochs", "30"],
                 ["train.py", "--arch", "B3c_c4x4_128+cinic_ft", "--init", "B3c_c4x4_128+cinic", *FT]]
@@ -334,11 +336,26 @@ def label_sections(text, log):
                    f"{TAG_AI} – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo: "
                    f"{', '.join(f'`{r}`' for r in others)}.")
         else:
-            run = title.split(" – ", 1)[1].strip() if " – " in title else config.CHOSEN_ARCH
+            run = title.split(" – ", 1)[1].strip() if " – " in title else "B_16_32_64"
             tag = (f"{TAG_OK} (`{run}`)." if run in ok_final else
                    f"{TAG_AI} (`{run}`) – chưa huấn luyện lại trên máy nhóm, chỉ để tham khảo.")
         out += ["", tag]
     return "\n".join(out)
+
+
+def extra_results():
+    """Đọc kết quả ảnh thật (anh_that.py) và nhiều seed (nhieu_seed.py) từ results.md, nếu đã chạy."""
+    text = RESULTS_FILE.read_text(encoding="utf-8") if RESULTS_FILE.exists() else ""
+    real, seeds = {}, {}
+    sec = re.search(r"^## Ảnh thật.*?(?=^## |\Z)", text, re.M | re.S)
+    if sec:
+        for k, v, ci in re.findall(r"^\| \*\*(\w+)\*\* \| [^|]+\| \*\*([\d,]+)%\*\* ± (\d+)", sec.group(0), re.M):
+            real[k] = f"{v}% ± {ci}"
+    for k, body in re.findall(r"^## Nhiều seed – (\w+)\n(.*?)(?=^## |\Z)", text, re.M | re.S):
+        m = re.search(r"\*\*(\d+) lần chạy – test số nguyên: ([\d,]+)% ± ([\d,]+)\*\*", body)
+        if m:
+            seeds[k] = f"**{m.group(2)}% ± {m.group(3)}** ({m.group(1)} seed)"
+    return real, seeds
 
 
 def write_doc(info, log):
@@ -353,10 +370,13 @@ def write_doc(info, log):
         return fmt(info[k]["hw"]["macs"] / (dsp * mhz * 1e6) * 1000, 1) + " ms"
 
     I = info
+    real, seeds = extra_results()
     table = "\n".join([
         head, sep,
         row("Tên lượt chạy (thư mục `model/export*`)", lambda k: f"`{MODELS[k]['run']}`"),
         row("**Test số nguyên** (đúng kết quả FPGA)", lambda k: f"**{fmt(I[k]['g']['int'])}%**" if I[k]["g"] else "–"),
+        row("Test số nguyên – trung bình nhiều seed", lambda k: seeds.get(k, "chưa chạy")),
+        row("Ảnh thật 108 ảnh (số nguyên, ± khoảng tin cậy 95%)", lambda k: real.get(k, "–")),
         row("Test float (PyTorch)", lambda k: f"{fmt(I[k]['float'])}%" if I[k]["float"] else "–"),
         row("Val float (dùng để chọn)", lambda k: f"{fmt(I[k]['val'])}%" if I[k]["val"] else "–"),
         row("Số đã ghi trước đây (float / số nguyên)",
@@ -428,7 +448,9 @@ BRAM bị lẻ khối 18 Kb và các bộ đệm dòng – thực tế cao hơn.
 ## Ghi chú từng mô hình
 
 - **B – Cơ bản:** mô hình nhóm đã học (3 conv). Dễ hiểu, nhỏ, nhanh; độ chính xác ~80%.
-- **B3c – Nhanh:** thân B + 1 conv 64→128 ở 4×4. Ít phép tính nhất trong nhóm >85%. Cần CINIC.
+- **B3c – ★ CHỌN ĐI THI (chốt 26/11/2026):** thân B + 1 conv 64→128 ở 4×4. Ít phép tính nhất trong nhóm >85%
+  (4,0 triệu MAC – nhanh gấp ~3–5 lần E/E2/E3d), BRAM ~55% nên còn chỗ cho phần điều khiển. Cần CINIC.
+  Lý do chọn: cuộc thi chấm chủ yếu tốc độ; B3c đổi ~3 điểm % độ chính xác lấy tốc độ gấp nhiều lần.
 - **E – Chính xác cao:** VGG rút gọn, cặp conv kép ở 16×16. Chậm nhất; **cũng là mạng thầy** (distillation) cho
   E2 và E3d, nên phải chạy E trước.
 - **E2 – Cân bằng:** như E nhưng cặp conv kép ở 8×8 → cùng tham số, ít hơn 36% phép tính.
