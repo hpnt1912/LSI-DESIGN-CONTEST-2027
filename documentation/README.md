@@ -29,6 +29,7 @@ bằng số nguyên, và vì sao 5 kiến trúc cho kết quả khác nhau.
 | 3 | [03_CNN_FOUNDATIONS.md](03_CNN_FOUNDATIONS.md) | 30 khái niệm CNN; mỗi khái niệm có bản chất, lý do, công thức, ví dụ thay số, vị trí trong code | nếu chưa vững lý thuyết |
 | 4 | [04_ARCHITECTURE_1_B.md](04_ARCHITECTURE_1_B.md) | Kiến trúc 1 – **B** (cơ bản, 80,00%) | đọc 04 thật kỹ; 05–08 cùng khung nên đọc nhanh hơn |
 | 5 | [05_ARCHITECTURE_2_B3c.md](05_ARCHITECTURE_2_B3c.md) | Kiến trúc 2 – **B3c** (nhanh, 87,60%) | |
+| 5b | [**05_ARCHITECTURE_2_B3c_v2.md**](05_ARCHITECTURE_2_B3c_v2.md) | **★ B3c (mô hình đi thi) từ A đến Z**: hình thành kiến trúc, huấn luyện, lượng tử hoá từng tầng, tính tay một ảnh thật qua cả mạng – mọi số có công thức → thay số → nguồn | đọc file này để hiểu sâu mô hình đi thi |
 | 6 | [06_ARCHITECTURE_3_E.md](06_ARCHITECTURE_3_E.md) | Kiến trúc 3 – **E** (chính xác cao, mạng thầy, 90,65%) | |
 | 7 | [07_ARCHITECTURE_4_E2.md](07_ARCHITECTURE_4_E2.md) | Kiến trúc 4 – **E2** (cân bằng, 89,60%) | |
 | 8 | [08_ARCHITECTURE_5_E3d.md](08_ARCHITECTURE_5_E3d.md) | Kiến trúc 5 – **E3d** (5 conv, 90,25%) | |
