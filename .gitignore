@@ -56,3 +56,4 @@ docs/*.pdf
 # File tạm của Word/WPS khi đang mở tài liệu
 ~$*
 .~lock.*
+*:Zone.Identifier
